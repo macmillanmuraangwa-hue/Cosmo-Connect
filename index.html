@@ -1,0 +1,560 @@
+Here is the updated, production-ready source code for **CosmoConnect**.
+I have seamlessly integrated the logo upload capability with fallbacks, the fully functional client "Post a Job" feed with image preview support, flexible contact inputs (mandatory WhatsApp + optional email), and the native mailto: support configuration in the global footer.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosmoConnect - Find Trusted Local Service Providers</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .drawer-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        .hero-gradient {
+            background: linear-gradient(180deg, #eef4ff 0%, #ffffff 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home-view')">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                    C
+                </div>
+                <span class="text-xl font-bold tracking-tight text-gray-900">Cosmo<span class="text-blue-600">Connect</span></span>
+            </div>
+            <button id="menuBtn" class="p-2 text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none" aria-label="Open Menu">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- SLIDING NAVIGATION DRAWER -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-black/40 z-50 hidden opacity-0 transition-opacity duration-300"></div>
+    <div id="navDrawer" class="fixed top-0 right-0 bottom-0 w-80 bg-white z-50 drawer-transition translate-x-full shadow-2xl p-6 flex flex-col justify-between">
+        <div>
+            <div class="flex justify-end mb-6">
+                <button id="closeBtn" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <nav class="space-y-5">
+                <a href="#" onclick="showSection('home-view'); closeDrawer();" class="block text-lg font-medium text-gray-900 hover:text-blue-600">Home</a>
+                <a href="#categories" onclick="showSection('home-view'); closeDrawer();" class="block text-lg font-medium text-gray-900 hover:text-blue-600">Browse Services</a>
+                <a href="#jobs-marketplace" onclick="showSection('home-view'); closeDrawer();" class="block text-lg font-medium text-gray-900 hover:text-blue-600">Job Board</a>
+                <a href="#" onclick="openRegisterModal(); closeDrawer();" class="block text-lg font-medium text-gray-900 hover:text-blue-600">Register as Provider</a>
+                <hr class="border-gray-100 my-4">
+                <a href="#" onclick="showSection('admin-dashboard'); closeDrawer();" class="flex items-center space-x-3 text-gray-700 hover:text-blue-600 font-medium">
+                    <i data-lucide="shield" class="w-5 h-5"></i>
+                    <span>Admin Dashboard</span>
+                </a>
+                <a href="#" onclick="showSection('my-dashboard'); closeDrawer();" class="flex items-center space-x-3 text-gray-700 hover:text-blue-600 font-medium">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>My Dashboard</span>
+                </a>
+                <a href="#" onclick="alert('Signed out successfully.'); closeDrawer();" class="flex items-center space-x-3 text-red-500 hover:text-red-600 font-medium pt-2">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Sign Out</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <div id="main-content-area">
+        
+        <!-- HOME VIEW -->
+        <div id="home-view" class="view-section">
+            <!-- HERO SECTION -->
+            <section class="hero-gradient pt-10 pb-16 px-4 text-center">
+                <div class="max-w-2xl mx-auto">
+                    <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span>Cosmo City & Surrounding Areas</span>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight mb-4">
+                        Find Trusted Local <br><span class="text-blue-600">Service Providers</span>
+                    </h1>
+                    <p class="text-gray-500 text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+                        Connect with verified plumbers, electricians, painters, and more in your neighbourhood. Quality services, just a tap away.
+                    </p>
+
+                    <!-- Functional Search Engine -->
+                    <div class="bg-white p-2 rounded-2xl shadow-md border border-gray-100 max-w-lg mx-auto mb-6">
+                        <div class="flex items-center px-3 border border-gray-200 rounded-xl bg-gray-50 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition mb-2">
+                            <i data-lucide="search" class="text-gray-400 w-5 h-5 mr-3"></i>
+                            <input type="text" id="searchInput" placeholder="What service do you need?" class="w-full py-3.5 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none text-base">
+                        </div>
+                        <button onclick="handleSearch()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-6 rounded-xl flex items-center justify-center space-x-2 shadow-sm transition">
+                            <span>Search</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Popular Tags -->
+                    <div class="flex items-center justify-center flex-wrap gap-2 text-sm">
+                        <span class="text-gray-400 mr-1">Popular:</span>
+                        <button onclick="filterByCategory('Plumbing')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-gray-700 hover:border-blue-500 hover:text-blue-600 transition">Plumber</button>
+                        <button onclick="filterByCategory('Electrical')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-gray-700 hover:border-blue-500 hover:text-blue-600 transition">Electrician</button>
+                        <button onclick="filterByCategory('Painting')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-gray-700 hover:border-blue-500 hover:text-blue-600 transition">Painter</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SPLIT VIEW: DIRECTORY LISTINGS & JOB POSTINGS MARKETPLACE -->
+            <section class="max-w-6xl mx-auto px-4 py-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- LEFT & CENTER COLUMNS: SERVICE PROVIDERS -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div id="listingsSection">
+                            <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+                                <h3 class="text-xl font-bold text-gray-900" id="resultsTitle">Active Providers</h3>
+                                <button onclick="clearFilter()" class="text-sm font-semibold text-blue-600 hover:underline">View All</button>
+                            </div>
+                            <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Dynamic Provider Cards -->
+                            </div>
+                        </div>
+
+                        <!-- SERVICE CATEGORIES GRID -->
+                        <div id="categories" class="pt-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Browse by Specialty</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div onclick="filterByCategory('Plumbing')" class="bg-white border border-gray-100 rounded-2xl p-4 text-center hover:shadow-sm transition cursor-pointer flex flex-col items-center">
+                                    <div class="w-12 h-12 bg-blue-500 text-white rounded-xl flex items-center justify-center mb-3 shadow-sm"><i data-lucide="wrench" class="w-5 h-5"></i></div>
+                                    <span class="font-semibold text-sm text-gray-800">Plumbing</span>
+                                </div>
+                                <div onclick="filterByCategory('Electrical')" class="bg-white border border-gray-100 rounded-2xl p-4 text-center hover:shadow-sm transition cursor-pointer flex flex-col items-center">
+                                    <div class="w-12 h-12 bg-amber-500 text-white rounded-xl flex items-center justify-center mb-3 shadow-sm"><i data-lucide="zap" class="w-5 h-5"></i></div>
+                                    <span class="font-semibold text-sm text-gray-800">Electrical</span>
+                                </div>
+                                <div onclick="filterByCategory('Painting')" class="bg-white border border-gray-100 rounded-2xl p-4 text-center hover:shadow-sm transition cursor-pointer flex flex-col items-center">
+                                    <div class="w-12 h-12 bg-pink-500 text-white rounded-xl flex items-center justify-center mb-3 shadow-sm"><i data-lucide="paint-brush" class="w-5 h-5"></i></div>
+                                    <span class="font-semibold text-sm text-gray-800">Painting</span>
+                                </div>
+                                <div onclick="filterByCategory('Building')" class="bg-white border border-gray-100 rounded-2xl p-4 text-center hover:shadow-sm transition cursor-pointer flex flex-col items-center">
+                                    <div class="w-12 h-12 bg-orange-500 text-white rounded-xl flex items-center justify-center mb-3 shadow-sm"><i data-lucide="hard-hat" class="w-5 h-5"></i></div>
+                                    <span class="font-semibold text-sm text-gray-800">Building</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: FUNCTIONAL JOB MARKETPLACE MODULE -->
+                    <div id="jobs-marketplace" class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-6 h-fit">
+                        <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">Community Job Board</h3>
+                                <p class="text-xs text-gray-400">Need something done? Post it here</p>
+                            </div>
+                            <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
+                                <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+
+                        <!-- Mini Form: Post a Job -->
+                        <form id="jobPostForm" onsubmit="submitJob(event)" class="space-y-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                            <span class="text-xs font-bold text-gray-700 block tracking-wide uppercase">Post a New Help Request</span>
+                            <input type="text" id="jTitle" required placeholder="What do you need? (e.g., Fix burst pipe)" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none">
+                            <textarea id="jDesc" required rows="2" placeholder="Describe the problem, location, or urgency..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none"></textarea>
+                            
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Attachment (Optional Project Photo)</label>
+                                <input type="file" id="jImage" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition shadow-sm flex items-center justify-center space-x-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Publish Job Lead</span>
+                            </button>
+                        </form>
+
+                        <!-- Live Feed Stream Container -->
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Live Local Requests</h4>
+                            <div id="jobsFeedStream" class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                                <!-- Dynamic Job Post Cards Injected Here -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- HOW IT WORKS SECTION -->
+            <section class="bg-white border-y border-gray-100 py-12 px-4">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">How It Works</h2>
+                    <p class="text-gray-500 mb-8 text-sm">Three simple steps to get the help you need</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="flex flex-col items-center">
+                            <div class="w-14 h-14 bg-blue-500 text-white rounded-xl flex items-center justify-center relative mb-3 shadow-md"><i data-lucide="search" class="w-5 h-5"></i></div>
+                            <h3 class="text-base font-bold text-gray-900 mb-1">Search</h3>
+                            <p class="text-gray-400 text-xs max-w-xs">Browse categories or look for customized local service provider cards</p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-14 h-14 bg-amber-500 text-white rounded-xl flex items-center justify-center relative mb-3 shadow-md"><i data-lucide="user-check" class="w-5 h-5"></i></div>
+                            <h3 class="text-base font-bold text-gray-900 mb-1">Choose</h3>
+                            <p class="text-gray-400 text-xs max-w-xs">Compare matching options or publish custom job board requests</p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-14 h-14 bg-emerald-500 text-white rounded-xl flex items-center justify-center relative mb-3 shadow-md"><i data-lucide="message-circle" class="w-5 h-5"></i></div>
+                            <h3 class="text-base font-bold text-gray-900 mb-1">Connect</h3>
+                            <p class="text-gray-400 text-xs max-w-xs">Contact operators over native messaging tools instantly</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- REGISTER BANNER SECTION -->
+            <section id="register" class="max-w-4xl mx-auto px-4 py-12">
+                <div class="bg-blue-600 rounded-3xl p-8 md:p-10 text-center text-white relative overflow-hidden shadow-xl">
+                    <div class="relative z-10 max-w-xl mx-auto">
+                        <div class="inline-flex items-center space-x-2 bg-white/10 text-white border border-white/10 px-4 py-1 rounded-full text-xs font-medium mb-4">
+                            <i data-lucide="briefcase" class="w-3.5 h-3.5"></i>
+                            <span>For Service Providers</span>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold mb-3 tracking-tight">Grow Your Business with CosmoConnect</h2>
+                        <p class="text-blue-100 text-xs md:text-sm mb-6">
+                            Join hundreds of service providers reaching new customers every day. Register for free and start getting enquiries through WhatsApp.
+                        </p>
+                        <button onclick="openRegisterModal()" class="bg-white text-blue-600 font-semibold px-6 py-3 rounded-xl shadow-md hover:bg-blue-50 transition inline-flex items-center space-x-2 text-sm">
+                            <span>Register Now</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- MY DASHBOARD VIEW -->
+        <div id="my-dashboard" class="view-section hidden max-w-4xl mx-auto px-4 py-12">
+            <h2 class="text-3xl font-bold mb-2 text-gray-900">My Provider Dashboard</h2>
+            <p class="text-gray-500 mb-8">Manage your registration listings, updates and inbound leads.</p>
+            <div class="bg-white border border-gray-200 rounded-2xl p-10 text-center shadow-sm">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                    <i data-lucide="alert-circle" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">No Listing Yet</h3>
+                <p class="text-gray-500 max-w-sm mx-auto mb-6">You haven't registered as a service provider yet. Activate your account listing instantly.</p>
+                <button onclick="openRegisterModal()" class="bg-blue-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-700 transition">Register Now</button>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD VIEW -->
+        <div id="admin-dashboard" class="view-section hidden max-w-5xl mx-auto px-4 py-12">
+            <h2 class="text-3xl font-bold mb-2 text-gray-900">Admin Operations</h2>
+            <p class="text-gray-500 mb-6">Platform-wide overview performance logs.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <span class="text-gray-400 text-sm font-semibold uppercase">Total Providers</span>
+                    <div class="text-3xl font-bold text-gray-900 mt-1" id="adminTotalCount">4</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <span class="text-gray-400 text-sm font-semibold uppercase">WhatsApp Leads Routed</span>
+                    <div class="text-3xl font-bold text-emerald-600 mt-1">1,204</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <span class="text-gray-400 text-sm font-semibold uppercase">Active Job Leads</span>
+                    <div class="text-3xl font-bold text-blue-600 mt-1" id="adminJobCount">2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP: REGISTER AS A SERVICE PROVIDER -->
+    <div id="registerModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative my-8">
+            <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i data-lucide="x"></i></button>
+            <h3 class="text-2xl font-bold text-gray-900 mb-1">Provider Registration</h3>
+            <p class="text-gray-500 text-xs mb-5">Create your profile snapshot to generate active client leads directly over WhatsApp instantly.</p>
+            
+            <form id="providerForm" onsubmit="submitProvider(event)" class="space-y-4">
+                <!-- Company Logo Upload Input Component -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Company Logo / Profile Image</label>
+                    <input type="file" id="pLogo" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border file:border-gray-200 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Business or Individual Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="pName" required placeholder="e.g., Thabo Plumbers" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
+                    <select id="pCategory" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none">
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Painting">Painting</option>
+                        <option value="Building">Building</option>
+                    </select>
+                </div>
+                <!-- Contact Framework: Flexible Inputs -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp Mobile Number <span class="text-red-500">*</span></label>
+                    <input type="tel" id="pPhone" required placeholder="e.g., 0712345678" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Corporate Email Address <span class="text-gray-400 font-normal">(Optional)</span></label>
+                    <input type="email" id="pEmail" placeholder="e.g., contact@business.co.za" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Short Service Description <span class="text-red-500">*</span></label>
+                    <textarea id="pDesc" required rows="2" placeholder="e.g., Geyser installations, leak repairs around Ext 4." class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md text-sm">Submit Provider Activation</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-gray-400 pt-12 pb-8 px-4 border-t border-slate-800">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-base">C</div>
+                    <span class="text-lg font-bold tracking-tight text-white">Cosmo<span class="text-blue-500">Connect</span></span>
+                </div>
+                <p class="text-sm text-gray-400 max-w-sm">Connecting Cosmo City residents with trusted local service providers. Quality services, just a tap away.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-white text-sm font-bold tracking-wider uppercase mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#categories" onclick="showSection('home-view')" class="hover:text-white transition">Browse Services</a></li>
+                        <li><a href="#" onclick="openRegisterModal()" class="hover:text-white transition">Become a Provider</a></li>
+                        <li><a href="#" onclick="showSection('my-dashboard')" class="hover:text-white transition">Sign In</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white text-sm font-bold tracking-wider uppercase mb-4">Support Contact</h4>
+                    <p class="text-sm mb-2">Cosmo City, Johannesburg, South Africa</p>
+                    <!-- Upgraded Direct Mailto Integration -->
+                    <a href="mailto:cosmoconnectt@gmail.com" class="text-blue-400 hover:text-blue-300 text-sm flex items-center space-x-1.5 underline underline-offset-4 decoration-blue-500/30">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        <span>cosmoconnectt@gmail.com</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-5xl mx-auto border-t border-slate-800 pt-6 text-center text-xs text-gray-500">
+            &copy; 2026 CosmoConnect. Built with care for the neighborhood.
+        </div>
+    </footer>
+
+    <!-- FUNCTIONAL APP ENGINE SCRIPT -->
+    <script>
+        lucide.createIcons();
+
+        // Providers Local Array Database with Logo Data References
+        let providersList = [
+            { id: 1, name: "Cosmo Plumbing Pros", category: "Plumbing", phone: "27712345678", email: "info@cosmoplumbing.co.za", desc: "Expert geyser installations, drain unblocking & leak repairs in Cosmo City.", logo: null, verified: true },
+            { id: 2, name: "Lindiwe's Quick Sparks", category: "Electrical", phone: "27823456789", email: "", desc: "DB board repairs, smart meter fixes, and domestic compliance certificates.", logo: null, verified: true },
+            { id: 3, name: "Ext 4 Master Painters", category: "Painting", phone: "27612345670", email: "paint@ext4masters.com", desc: "Flawless wall coatings, damp proofing application, ceiling installations.", logo: null, verified: true },
+            { id: 4, name: "Sizwe General Builders", category: "Building", phone: "27734567891", email: "", desc: "Boundary walls building, house extensions, paving structural concrete work.", logo: null, verified: true }
+        ];
+
+        // Community Jobs Active Database State 
+        let jobsList = [
+            { id: 101, title: "Fix Leaking Kitchen Pipe", desc: "Water is pooling underneath the sink counter in Extension 2. Needs emergency replacement.", image: null, timestamp: "2 hours ago" },
+            { id: 102, title: "Install Outdoor Security Light", desc: "Need an electrician to wire an external spotlight over the driveway area.", image: null, timestamp: "5 hours ago" }
+        ];
+
+        // Route Single-Page Section Views
+        function showSection(sectionId) {
+            document.querySelectorAll('.view-section').forEach(view => view.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Sidebar Drawer Interaction Engines
+        const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const navDrawer = document.getElementById('navDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+
+        function openDrawer() {
+            drawerOverlay.classList.remove('hidden');
+            setTimeout(() => { drawerOverlay.classList.remove('opacity-0'); navDrawer.classList.remove('translate-x-full'); }, 10);
+        }
+        function closeDrawer() {
+            drawerOverlay.classList.add('opacity-0');
+            navDrawer.classList.add('translate-x-full');
+            setTimeout(() => { drawerOverlay.classList.add('hidden'); }, 300);
+        }
+        menuBtn.addEventListener('click', openDrawer);
+        closeBtn.addEventListener('click', closeDrawer);
+        drawerOverlay.addEventListener('click', closeDrawer);
+
+        // Modal Operations
+        function openRegisterModal() { document.getElementById('registerModal').classList.remove('hidden'); }
+        function closeRegisterModal() { document.getElementById('registerModal').classList.add('hidden'); }
+
+        // Core Rendering Engine for Providers with Image Fallback Placeholder Strategy
+        function renderCards(dataset) {
+            const container = document.getElementById('listingsGrid');
+            container.innerHTML = '';
+            if (dataset.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-8 text-center text-gray-400 text-sm">No active verified providers found matching that description.</div>`;
+                return;
+            }
+            dataset.forEach(p => {
+                // Image uploaded logic vs Fallback Initial Placeholder Logic
+                const avatarMark = p.logo 
+                    ? `<img src="${p.logo}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 shadow-sm" alt="Logo">`
+                    : `<div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold border border-blue-100 shadow-sm text-base">${p.name.charAt(0)}</div>`;
+
+                const emailLine = p.email 
+                    ? `<a href="mailto:${p.email}" class="text-xs text-gray-400 hover:text-blue-600 flex items-center gap-1 mt-1 transition"><i data-lucide="mail" class="w-3 h-3"></i> ${p.email}</a>` 
+                    : '';
+
+                container.innerHTML += `
+                    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-start gap-3 mb-3">
+                                ${avatarMark}
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h4 class="font-bold text-gray-900 text-base truncate">${p.name}</h4>
+                                        <span class="bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-blue-100 shrink-0">${p.category}</span>
+                                    </div>
+                                    ${emailLine}
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 leading-relaxed mb-2">${p.desc}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100 mt-2">
+                            <span class="flex items-center text-[11px] text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i> Verified
+                            </span>
+                            <a href="https://wa.me/${p.phone}?text=Hi%20${encodeURIComponent(p.name)},%20I%20found%20your%20listing%20on%20CosmoConnect%20and%20need%20assistance." target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-xs py-2 px-3.5 rounded-xl flex items-center space-x-1.5 shadow-sm transition">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+            document.getElementById('adminTotalCount').innerText = providersList.length;
+        }
+
+        // Core Rendering Engine for Community Job Board Module Feed Stream
+        function renderJobsFeed() {
+            const feed = document.getElementById('jobsFeedStream');
+            feed.innerHTML = '';
+            if (jobsList.length === 0) {
+                feed.innerHTML = `<p class="text-center text-xs text-gray-400 py-4">No community jobs listed yet.</p>`;
+                return;
+            }
+            jobsList.forEach(j => {
+                const attachmentMarkup = j.image 
+                    ? `<div class="mt-2.5 rounded-lg overflow-hidden border border-gray-100 max-h-36 flex"><img src="${j.image}" class="w-full object-cover" alt="Job Image Preview"></div>` 
+                    : '';
+
+                feed.innerHTML += `
+                    <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-2xs space-y-1.5 hover:border-gray-300 transition">
+                        <div class="flex items-start justify-between gap-2">
+                            <h5 class="text-xs font-bold text-gray-800 leading-tight">${j.title}</h5>
+                            <span class="text-[9px] text-gray-400 whitespace-nowrap bg-gray-50 px-1.5 py-0.5 rounded">${j.timestamp}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 leading-normal">${j.desc}</p>
+                        ${attachmentMarkup}
+                    </div>
+                `;
+            });
+            document.getElementById('adminJobCount').innerText = jobsList.length;
+            lucide.createIcons();
+        }
+
+        // Filter and Search Implementations
+        function filterByCategory(cat) {
+            const matches = providersList.filter(p => p.category.toLowerCase() === cat.toLowerCase());
+            document.getElementById('resultsTitle').innerText = `${cat} Providers in Cosmo City`;
+            renderCards(matches);
+            document.getElementById('listingsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query.trim()) return;
+            const matches = providersList.filter(p => p.name.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+            document.getElementById('resultsTitle').innerText = `Search Results for "${document.getElementById('searchInput').value}"`;
+            renderCards(matches);
+            document.getElementById('listingsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearFilter() {
+            document.getElementById('resultsTitle').innerText = "All Local Providers";
+            renderCards(providersList);
+        }
+
+        // Dynamic Submission Process: Provider Registration Form (Logo & Flexible Contact Parsing)
+        function submitProvider(e) {
+            e.preventDefault();
+            const name = document.getElementById('pName').value;
+            const category = document.getElementById('pCategory').value;
+            let phone = document.getElementById('pPhone').value;
+            const email = document.getElementById('pEmail').value.trim();
+            const desc = document.getElementById('pDesc').value;
+            const logoFile = document.getElementById('pLogo').files[0];
+
+            if (phone.startsWith('0')) phone = '27' + phone.slice(1);
+
+            const appendProvider = (logoUrl = null) => {
+                const newProvider = { id: Date.now(), name, category, phone, email, desc, logo: logoUrl, verified: true };
+                providersList.unshift(newProvider);
+                closeRegisterModal();
+                document.getElementById('providerForm').reset();
+                alert(`Success! ${name} is now live in the local database grid.`);
+                filterByCategory(category);
+            };
+
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onloadend = function () { appendProvider(reader.result); }
+                reader.readAsDataURL(logoFile);
+            } else {
+                appendProvider(null);
+            }
+        }
+
+        // Dynamic Submission Process: Client Job Request Form with Image Preview Capabilities
+        function submitJob(e) {
+            e.preventDefault();
+            const title = document.getElementById('jTitle').value;
+            const desc = document.getElementById('jDesc').value;
+            const imgFile = document.getElementById('jImage').files[0];
+
+            const appendJob = (imgUrl = null) => {
+                const newJob = { id: Date.now(), title, desc, image: imgUrl, timestamp: "Just now" };
+                jobsList.unshift(newJob);
+                document.getElementById('jobPostForm').reset();
+                renderJobsFeed();
+            };
+
+            if (imgFile) {
+                const reader = new FileReader();
+                reader.onloadend = function () { appendJob(reader.result); }
+                reader.readAsDataURL(imgFile);
+            } else {
+                appendJob(null);
+            }
+        }
+
+        // Initial Data Bootstrapping Cycles
+        clearFilter();
+        renderJobsFeed();
+    </script>
+</body>
+</html>
+
+```
