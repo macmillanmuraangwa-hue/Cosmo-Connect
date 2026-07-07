@@ -7,6 +7,9 @@
     <meta name="theme-color" content="#0A2540">
     <title>CosmoConnect - Cosmo City's Local Marketplace & Community Hub</title>
     
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons CDN -->
@@ -86,87 +89,124 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
     
-    <!-- HEADER / NAVIGATION -->
-    <header class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+    <!-- AUTH VIEW -->
+    <section id="authView" class="view-section fade-in min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-md w-full">
+            <div class="card p-8 text-center">
+                <!-- Logo -->
+                <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold text-2xl mx-auto mb-6">C</div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">CosmoConnect</h1>
+                <p class="text-gray-600 mb-8">Cosmo City's Local Marketplace & Community Hub</p>
+                
+                <!-- Google Sign-In Button -->
+                <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE" data-callback="handleCredentialResponse"></div>
+                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular" data-logo_alignment="left"></div>
+                
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">or continue with email</span>
+                    </div>
+                </div>
+                
+                <!-- Email Sign In Form -->
+                <form id="emailSignInForm" class="space-y-4">
+                    <input type="email" id="signInEmail" placeholder="your@email.com" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="password" id="signInPassword" placeholder="Password" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button type="submit" class="w-full btn-primary">Sign In</button>
+                </form>
+                
+                <p class="text-gray-600 text-sm mt-4">
+                    Don't have an account? <button onclick="showSignUpForm()" class="text-blue-600 hover:underline font-semibold">Sign up</button>
+                </p>
+                
+                <!-- Admin Test Info -->
+                <div class="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-xs text-blue-700"><strong>Demo Admin:</strong> macmillanmuraangwa@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- SIGNUP VIEW -->
+    <section id="signupView" class="view-section hidden fade-in min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-md w-full">
+            <div class="card p-8">
+                <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold text-2xl mx-auto mb-6">C</div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2 text-center">Create Account</h1>
+                <p class="text-gray-600 mb-8 text-center">Join CosmoConnect today</p>
+                
+                <div id="g_id_onload_signup" data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE" data-callback="handleCredentialResponse"></div>
+                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signup_with" data-shape="rectangular" data-logo_alignment="left"></div>
+                
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
+                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">or sign up with email</span></div>
+                </div>
+                
+                <form id="emailSignUpForm" class="space-y-4">
+                    <input type="text" id="signUpName" placeholder="Full Name" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="email" id="signUpEmail" placeholder="your@email.com" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="password" id="signUpPassword" placeholder="Create Password" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="tel" id="signUpPhone" placeholder="+27 71 234 5678" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button type="submit" class="w-full btn-primary">Create Account</button>
+                </form>
+                
+                <p class="text-gray-600 text-sm mt-4 text-center">
+                    Already have an account? <button onclick="showSignInForm()" class="text-blue-600 hover:underline font-semibold">Sign in</button>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm hidden" id="mainHeader">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center gap-2 cursor-pointer" onclick="showView('home')">
                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold text-xl">C</div>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900">Cosmo<span class="text-blue-600">Connect</span></h1>
-                    <p class="text-xs text-gray-500">Cosmo City Hub</p>
-                </div>
+                <div><h1 class="text-xl font-bold text-gray-900">Cosmo<span class="text-blue-600">Connect</span></h1>
+                <p class="text-xs text-gray-500">Cosmo City Hub</p></div>
             </div>
             
-            <!-- Desktop Navigation -->
             <nav class="hidden md:flex items-center gap-8">
                 <button onclick="showView('home')" class="text-gray-700 hover:text-blue-600 font-medium transition">Home</button>
+                <button onclick="showView('services')" class="text-gray-700 hover:text-blue-600 font-medium transition">Services</button>
                 <button onclick="showView('marketplace')" class="text-gray-700 hover:text-blue-600 font-medium transition">Marketplace</button>
-                <button onclick="showView('jobs')" class="text-gray-700 hover:text-blue-600 font-medium transition">Jobs</button>
-                <button onclick="showView('messages')" class="text-gray-700 hover:text-blue-600 font-medium transition relative">
-                    Messages
-                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="msgBadge">0</span>
-                </button>
-                <button onclick="toggleProfileMenu()" class="text-gray-700 hover:text-blue-600 font-medium transition">Profile</button>
+                <button onclick="showView('messages')" class="text-gray-700 hover:text-blue-600 font-medium transition relative">Messages <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="msgBadge">0</span></button>
+                <button onclick="showView('profile')" class="text-gray-700 hover:text-blue-600 font-medium transition">Profile</button>
             </nav>
             
-            <!-- Mobile Menu Button -->
             <button onclick="toggleMobileMenu()" class="md:hidden p-2 hover:bg-gray-100 rounded-lg">
                 <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
         </div>
     </header>
     
-    <!-- MOBILE NAVIGATION DRAWER -->
+    <!-- MOBILE MENU -->
     <div id="mobileMenuDrawer" class="fixed inset-0 z-50 hidden md:hidden">
         <div id="mobileMenuOverlay" class="absolute inset-0 bg-black/40 drawer-overlay" onclick="toggleMobileMenu()"></div>
         <div id="mobileMenuPanel" class="absolute right-0 top-0 h-full w-72 bg-white shadow-xl drawer p-6 flex flex-col transform translate-x-full">
-            <button onclick="toggleMobileMenu()" class="self-end p-2 hover:bg-gray-100 rounded-lg mb-6">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
+            <button onclick="toggleMobileMenu()" class="self-end p-2 hover:bg-gray-100 rounded-lg mb-6"><i data-lucide="x" class="w-6 h-6"></i></button>
             <nav class="flex flex-col gap-4 flex-1">
                 <button onclick="showView('home'); toggleMobileMenu()" class="text-left text-lg font-medium text-gray-900 hover:text-blue-600">Home</button>
+                <button onclick="showView('services'); toggleMobileMenu()" class="text-left text-lg font-medium text-gray-900 hover:text-blue-600">Services</button>
                 <button onclick="showView('marketplace'); toggleMobileMenu()" class="text-left text-lg font-medium text-gray-900 hover:text-blue-600">Marketplace</button>
-                <button onclick="showView('jobs'); toggleMobileMenu()" class="text-left text-lg font-medium text-gray-900 hover:text-blue-600">Jobs</button>
                 <button onclick="showView('messages'); toggleMobileMenu()" class="text-left text-lg font-medium text-gray-900 hover:text-blue-600">Messages</button>
                 <button onclick="showView('profile'); toggleMobileMenu()" class="text-left text-lg font-medium text-gray-900 hover:text-blue-600">Profile</button>
                 <hr class="my-4">
-                <button onclick="showView('admin'); toggleMobileMenu()" class="text-left text-lg font-medium text-blue-600 hover:text-blue-700">Admin Dashboard</button>
+                <button id="adminMenuBtn" onclick="showView('admin'); toggleMobileMenu()" class="text-left text-lg font-medium text-blue-600 hover:text-blue-700 hidden">Admin Dashboard</button>
                 <button onclick="logout()" class="text-left text-lg font-medium text-red-600 hover:text-red-700">Sign Out</button>
             </nav>
         </div>
     </div>
     
-    <!-- BOTTOM NAVIGATION (Mobile) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around z-40">
-        <button onclick="showView('home')" class="flex-1 py-3 flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600 transition" id="navHome">
-            <i data-lucide="home" class="w-5 h-5"></i>
-            <span class="text-xs">Home</span>
-        </button>
-        <button onclick="showView('marketplace')" class="flex-1 py-3 flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600 transition" id="navMarket">
-            <i data-lucide="search" class="w-5 h-5"></i>
-            <span class="text-xs">Search</span>
-        </button>
-        <button onclick="openCreatePostModal()" class="flex-1 py-3 flex flex-col items-center gap-1 text-blue-600 hover:text-blue-700 transition" id="navCreate">
-            <i data-lucide="plus-circle" class="w-6 h-6"></i>
-            <span class="text-xs">Create</span>
-        </button>
-        <button onclick="showView('messages')" class="flex-1 py-3 flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600 transition relative" id="navMsg">
-            <i data-lucide="message-square" class="w-5 h-5"></i>
-            <span class="text-xs">Messages</span>
-            <span class="absolute top-1 right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]" id="navMsgBadge">0</span>
-        </button>
-        <button onclick="showView('profile')" class="flex-1 py-3 flex flex-col items-center gap-1 text-gray-600 hover:text-blue-600 transition" id="navProfile">
-            <i data-lucide="user" class="w-5 h-5"></i>
-            <span class="text-xs">Profile</span>
-        </button>
-    </nav>
-    
     <!-- MAIN CONTENT -->
-    <main class="max-w-7xl mx-auto mb-20 md:mb-0">
+    <main class="max-w-7xl mx-auto mb-20 md:mb-0 hidden" id="mainContent">
         
         <!-- HOME VIEW -->
         <section id="homeView" class="view-section fade-in">
-            <!-- HERO SECTION -->
             <div class="hero-gradient text-white py-16 px-4">
                 <div class="max-w-4xl mx-auto text-center">
                     <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur border border-white/30 text-white px-4 py-2 rounded-full mb-6 text-sm font-medium">
@@ -176,104 +216,113 @@
                     <h2 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Your Local Community Hub</h2>
                     <p class="text-lg text-blue-100 max-w-2xl mx-auto mb-8">Find trusted neighbors offering services, discover job opportunities, support local businesses, and strengthen our community.</p>
                     
-                    <!-- Search Bar -->
                     <div class="bg-white p-2 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8">
                         <div class="flex gap-2">
                             <input type="text" id="heroSearch" placeholder="Search services, jobs, or businesses..." class="flex-1 px-4 py-3 text-gray-800 rounded-xl focus:outline-none">
                             <button onclick="performSearch()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition flex items-center gap-2">
-                                <i data-lucide="search" class="w-5 h-5"></i>
-                                <span class="hidden sm:inline">Search</span>
+                                <i data-lucide="search" class="w-5 h-5"></i><span class="hidden sm:inline">Search</span>
                             </button>
                         </div>
                     </div>
                     
-                    <!-- Quick Actions -->
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button onclick="openCreatePostModal()" class="btn-primary">
-                            <i data-lucide="plus" class="w-5 h-5 inline mr-2"></i>
-                            Create Post
-                        </button>
-                        <button onclick="showView('marketplace')" class="bg-white text-blue-600 font-semibold py-3 px-6 rounded-xl hover:bg-gray-50 transition">
-                            <i data-lucide="grid" class="w-5 h-5 inline mr-2"></i>
-                            Browse Marketplace
-                        </button>
+                        <button onclick="openCreatePostModal()" class="btn-primary"><i data-lucide="plus" class="w-5 h-5 inline mr-2"></i>Create Post</button>
+                        <button onclick="showView('services')" class="bg-white text-blue-600 font-semibold py-3 px-6 rounded-xl hover:bg-gray-50 transition"><i data-lucide="grid" class="w-5 h-5 inline mr-2"></i>Browse Services</button>
                     </div>
                 </div>
             </div>
             
-            <!-- CATEGORIES SECTION -->
+            <!-- CATEGORIES -->
             <div class="px-4 py-12">
                 <div class="max-w-6xl mx-auto">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Browse Categories</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
-                        <div onclick="filterByCategory('Jobs')" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <div class="w-12 h-12 bg-blue-500 text-white rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <i data-lucide="briefcase" class="w-6 h-6"></i>
-                            </div>
-                            <p class="font-semibold text-sm text-gray-800">Jobs</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-8">What are you looking for?</h3>
+                    
+                    <div class="mb-12">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-2xl">🏠</span> Housing</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            <div onclick="filterByCategory('rooms-rent')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="door-open" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Rooms to Rent</p></div>
+                            <div onclick="filterByCategory('houses-rent')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="home" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Houses to Rent</p></div>
+                            <div onclick="filterByCategory('flats-apartments')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="building-2" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Flats & Apartments</p></div>
+                            <div onclick="filterByCategory('roommates-wanted')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="users" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Roommates Wanted</p></div>
+                            <div onclick="filterByCategory('property-sale')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="tag" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Property for Sale</p></div>
                         </div>
-                        <div onclick="filterByCategory('Services')" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <div class="w-12 h-12 bg-amber-500 text-white rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <i data-lucide="wrench" class="w-6 h-6"></i>
-                            </div>
-                            <p class="font-semibold text-sm text-gray-800">Services</p>
+                    </div>
+                    
+                    <div class="mb-12">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-2xl">🔧</span> Find a Service</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            <div onclick="filterByBusinessType('inquiry', 'Plumbers')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="wrench" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Plumbers</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Electricians')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="zap" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Electricians</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Painters')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="palette" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Painters</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Builders')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="hard-hat" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Builders</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Mechanics')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="wrench-2" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Mechanics</p></div>
                         </div>
-                        <div onclick="filterByCategory('Buy & Sell')" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <div class="w-12 h-12 bg-green-500 text-white rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-                            </div>
-                            <p class="font-semibold text-sm text-gray-800">Buy & Sell</p>
-                        </div>
-                        <div onclick="filterByCategory('Businesses')" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <div class="w-12 h-12 bg-purple-500 text-white rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <i data-lucide="store" class="w-6 h-6"></i>
-                            </div>
-                            <p class="font-semibold text-sm text-gray-800">Businesses</p>
-                        </div>
-                        <div onclick="filterByCategory('Rentals')" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <div class="w-12 h-12 bg-pink-500 text-white rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <i data-lucide="home" class="w-6 h-6"></i>
-                            </div>
-                            <p class="font-semibold text-sm text-gray-800">Rentals</p>
-                        </div>
-                        <div onclick="filterByCategory('Events')" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <div class="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <i data-lucide="calendar" class="w-6 h-6"></i>
-                            </div>
-                            <p class="font-semibold text-sm text-gray-800">Events</p>
-                        </div>
-                        <div onclick="filterByCategory('Community')" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <div class="w-12 h-12 bg-cyan-500 text-white rounded-xl flex items-center justify-center mx-auto mb-2">
-                                <i data-lucide="users" class="w-6 h-6"></i>
-                            </div>
-                            <p class="font-semibold text-sm text-gray-800">Community</p>
+                    </div>
+                    
+                    <div class="mb-12">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-2xl">🏪</span> Local Businesses</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                            <div onclick="filterByBusinessType('booking', 'Barbers')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="scissors" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Barbers</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Salons')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="sparkles" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Salons</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Beauty')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="heart" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Beauty & Spa</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Restaurants')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="utensils" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Restaurants</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Tutors')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="book" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Tutors</p></div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- FEATURED POSTS / TESTIMONIALS -->
+            <!-- HOW IT WORKS -->
             <div class="px-4 py-12 bg-white">
                 <div class="max-w-6xl mx-auto">
                     <h3 class="text-2xl font-bold text-gray-900 mb-8">How It Works</h3>
                     <div class="grid md:grid-cols-3 gap-8">
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
-                            <h4 class="font-bold text-lg text-gray-900 mb-2">Create Profile</h4>
-                            <p class="text-gray-600">Set up your account with your details, location, and interests to get started.</p>
+                        <div class="text-center"><div class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div><h4 class="font-bold text-lg text-gray-900 mb-2">Create Profile</h4><p class="text-gray-600">Set up your account with your details and location.</p></div>
+                        <div class="text-center"><div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div><h4 class="font-bold text-lg text-gray-900 mb-2">Find Services</h4><p class="text-gray-600">Browse local businesses or post what you need.</p></div>
+                        <div class="text-center"><div class="w-16 h-16 bg-blue-700 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div><h4 class="font-bold text-lg text-gray-900 mb-2">Connect Instantly</h4><p class="text-gray-600">Message or book via WhatsApp with one tap.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- SERVICES VIEW -->
+        <section id="servicesView" class="view-section hidden fade-in px-4 py-8">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Find Services & Businesses</h2>
+                
+                <div class="card p-4 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Service Type</label>
+                            <select id="serviceTypeFilter" onchange="applyServiceFilters()" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option value="">All Services</option>
+                                <option value="inquiry">Quick Services (Inquiry-based)</option>
+                                <option value="booking">Bookable Services</option>
+                            </select>
                         </div>
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
-                            <h4 class="font-bold text-lg text-gray-900 mb-2">Post or Search</h4>
-                            <p class="text-gray-600">Create posts or search for services, jobs, and products in your community.</p>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                            <select id="serviceCategory" onchange="applyServiceFilters()" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option value="">All Categories</option>
+                                <option value="Plumbers">Plumbers</option>
+                                <option value="Electricians">Electricians</option>
+                                <option value="Barbers">Barbers</option>
+                                <option value="Salons">Salons</option>
+                                <option value="Beauty">Beauty & Spa</option>
+                            </select>
                         </div>
-                        <div class="text-center">
-                            <div class="w-16 h-16 bg-blue-700 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div>
-                            <h4 class="font-bold text-lg text-gray-900 mb-2">Connect on WhatsApp</h4>
-                            <p class="text-gray-600">Message sellers directly or contact service providers via WhatsApp instantly.</p>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                            <input type="text" id="serviceLocation" placeholder="Cosmo City..." class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button onclick="applyServiceFilters()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">Filter</button>
+                            <button onclick="clearServiceFilters()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Reset</button>
                         </div>
                     </div>
                 </div>
+                
+                <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><!-- Services will be loaded here --></div>
             </div>
         </section>
         
@@ -282,20 +331,15 @@
             <div class="max-w-6xl mx-auto">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Marketplace</h2>
                 
-                <!-- Filters -->
                 <div class="card p-4 mb-8">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
                             <select id="filterCategory" onchange="applyFilters()" class="w-full border border-gray-300 rounded-lg px-3 py-2">
                                 <option value="">All Categories</option>
-                                <option value="Jobs">Jobs</option>
-                                <option value="Services">Services</option>
                                 <option value="Buy & Sell">Buy & Sell</option>
-                                <option value="Businesses">Businesses</option>
-                                <option value="Rentals">Rentals</option>
-                                <option value="Events">Events</option>
-                                <option value="Community">Community</option>
+                                <option value="Free Items">Free Items</option>
+                                <option value="Wanted Items">Wanted Items</option>
                             </select>
                         </div>
                         <div>
@@ -319,26 +363,7 @@
                     </div>
                 </div>
                 
-                <!-- Posts Grid -->
-                <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Posts will be loaded here -->
-                </div>
-            </div>
-        </section>
-        
-        <!-- JOBS VIEW -->
-        <section id="jobsView" class="view-section hidden fade-in px-4 py-8">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-gray-900">Job Board</h2>
-                    <button onclick="openCreatePostModal()" class="btn-primary flex items-center gap-2">
-                        <i data-lucide="plus" class="w-5 h-5"></i>
-                        Post a Job
-                    </button>
-                </div>
-                <div id="jobsGrid" class="space-y-4">
-                    <!-- Jobs will be loaded here -->
-                </div>
+                <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><!-- Posts will be loaded here --></div>
             </div>
         </section>
         
@@ -349,7 +374,7 @@
                 <div class="card p-8 text-center">
                     <i data-lucide="message-square" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
                     <h3 class="text-xl font-semibold text-gray-700 mb-2">Direct Messaging Coming Soon</h3>
-                    <p class="text-gray-600">Users can chat directly with service providers, sellers, and community members using our messaging platform.</p>
+                    <p class="text-gray-600">Users can chat directly with service providers and sellers via WhatsApp.</p>
                 </div>
             </div>
         </section>
@@ -359,73 +384,39 @@
             <div class="max-w-2xl mx-auto">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">My Profile</h2>
                 
-                <!-- Profile Card -->
                 <div class="card p-8 mb-6">
                     <div class="flex items-start gap-6 mb-6">
-                        <div class="avatar bg-gradient-to-br from-blue-500 to-blue-600 w-24 h-24 text-3xl">
-                            J
-                        </div>
+                        <div id="profileAvatar" class="avatar bg-gradient-to-br from-blue-500 to-blue-600 w-24 h-24 text-3xl">J</div>
                         <div class="flex-1">
-                            <h3 class="text-2xl font-bold text-gray-900">John Doe</h3>
-                            <p class="text-gray-600">Cosmo City, Johannesburg</p>
+                            <h3 id="profileName" class="text-2xl font-bold text-gray-900">John Doe</h3>
+                            <p id="profileLocation" class="text-gray-600">Cosmo City, Johannesburg</p>
                             <div class="flex gap-2 mt-3">
-                                <span class="badge badge-success">
-                                    <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
-                                    Verified
-                                </span>
-                                <span class="badge badge-primary">
-                                    <i data-lucide="star" class="w-4 h-4 mr-1"></i>
-                                    4.8 Stars
-                                </span>
+                                <span class="badge badge-success"><i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>Verified</span>
+                                <span class="badge badge-primary"><i data-lucide="star" class="w-4 h-4 mr-1"></i>4.8 Stars</span>
                             </div>
                         </div>
                     </div>
                     <div class="border-t border-gray-200 pt-6 space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Bio</label>
-                            <p class="text-gray-600">Passionate about helping my community. Available for services and collaborations.</p>
+                            <p id="profileBio" class="text-gray-600">Passionate about helping my community.</p>
                         </div>
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
-                                <a href="tel:+27712345678" class="text-blue-600 hover:underline">+27 71 234 5678</a>
+                                <a id="profilePhone" href="tel:+27712345678" class="text-blue-600 hover:underline">+27 71 234 5678</a>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                                <a href="mailto:john@example.com" class="text-blue-600 hover:underline">john@example.com</a>
+                                <a id="profileEmail" href="mailto:john@example.com" class="text-blue-600 hover:underline">john@example.com</a>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
-                            <p class="text-gray-600">Extension 4, Cosmo City</p>
-                        </div>
                     </div>
                 </div>
                 
-                <!-- My Posts -->
-                <div class="card p-6 mb-6">
-                    <h4 class="text-lg font-bold text-gray-900 mb-4">My Posts (3)</h4>
-                    <div id="myPostsGrid" class="space-y-4">
-                        <!-- User's posts will be displayed here -->
-                    </div>
-                </div>
-                
-                <!-- Saved Posts -->
-                <div class="card p-6 mb-6">
-                    <h4 class="text-lg font-bold text-gray-900 mb-4">Saved Posts (5)</h4>
-                    <button class="w-full btn-secondary">View All Saved</button>
-                </div>
-                
-                <!-- Action Buttons -->
                 <div class="flex gap-4">
-                    <button onclick="editProfile()" class="flex-1 btn-primary">
-                        <i data-lucide="edit" class="w-5 h-5 inline mr-2"></i>
-                        Edit Profile
-                    </button>
-                    <button onclick="logout()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition">
-                        <i data-lucide="log-out" class="w-5 h-5 inline mr-2"></i>
-                        Sign Out
-                    </button>
+                    <button onclick="editProfile()" class="flex-1 btn-primary"><i data-lucide="edit" class="w-5 h-5 inline mr-2"></i>Edit Profile</button>
+                    <button onclick="logout()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition"><i data-lucide="log-out" class="w-5 h-5 inline mr-2"></i>Sign Out</button>
                 </div>
             </div>
         </section>
@@ -435,125 +426,41 @@
             <div class="max-w-6xl mx-auto">
                 <h2 class="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h2>
                 
-                <!-- Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="card p-6">
-                        <p class="text-gray-600 text-sm font-semibold mb-2">Total Users</p>
-                        <p class="text-4xl font-bold text-blue-600" id="statUsers">1,248</p>
-                        <p class="text-xs text-gray-500 mt-2">+12% this month</p>
-                    </div>
-                    <div class="card p-6">
-                        <p class="text-gray-600 text-sm font-semibold mb-2">Active Posts</p>
-                        <p class="text-4xl font-bold text-green-600" id="statPosts">342</p>
-                        <p class="text-xs text-gray-500 mt-2">+28 today</p>
-                    </div>
-                    <div class="card p-6">
-                        <p class="text-gray-600 text-sm font-semibold mb-2">Reports</p>
-                        <p class="text-4xl font-bold text-amber-600" id="statReports">12</p>
-                        <p class="text-xs text-gray-500 mt-2">3 pending review</p>
-                    </div>
-                    <div class="card p-6">
-                        <p class="text-gray-600 text-sm font-semibold mb-2">Revenue</p>
-                        <p class="text-4xl font-bold text-purple-600">R45,320</p>
-                        <p class="text-xs text-gray-500 mt-2">+8% vs last month</p>
-                    </div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Total Users</p><p class="text-4xl font-bold text-blue-600">1,248</p><p class="text-xs text-gray-500 mt-2">+12% this month</p></div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Active Posts</p><p class="text-4xl font-bold text-green-600">342</p><p class="text-xs text-gray-500 mt-2">+28 today</p></div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Services</p><p class="text-4xl font-bold text-blue-600">87</p><p class="text-xs text-gray-500 mt-2">Local Businesses</p></div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Revenue</p><p class="text-4xl font-bold text-purple-600">R45K</p><p class="text-xs text-gray-500 mt-2">+8% vs last month</p></div>
                 </div>
                 
-                <!-- Admin Tabs -->
                 <div class="card p-6">
-                    <div class="flex gap-4 border-b border-gray-200 mb-6">
-                        <button onclick="switchAdminTab('users')" class="tab-btn pb-3 font-semibold text-blue-600 border-b-2 border-blue-600" data-tab="users">Users</button>
-                        <button onclick="switchAdminTab('posts')" class="tab-btn pb-3 font-semibold text-gray-600 hover:text-gray-900" data-tab="posts">Posts</button>
-                        <button onclick="switchAdminTab('reports')" class="tab-btn pb-3 font-semibold text-gray-600 hover:text-gray-900" data-tab="reports">Reports</button>
-                        <button onclick="switchAdminTab('analytics')" class="tab-btn pb-3 font-semibold text-gray-600 hover:text-gray-900" data-tab="analytics">Analytics</button>
+                    <div class="flex gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
+                        <button onclick="switchAdminTab('users')" class="tab-btn pb-3 font-semibold text-blue-600 border-b-2 border-blue-600 whitespace-nowrap" data-tab="users">Users</button>
+                        <button onclick="switchAdminTab('services')" class="tab-btn pb-3 font-semibold text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="services">Services</button>
+                        <button onclick="switchAdminTab('posts')" class="tab-btn pb-3 font-semibold text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="posts">Posts</button>
                     </div>
                     
-                    <!-- Users Tab -->
                     <div id="usersTab" class="tab-content">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-gray-50 border-b border-gray-200">
-                                    <tr>
-                                        <th class="px-4 py-3 font-semibold text-gray-700">User</th>
-                                        <th class="px-4 py-3 font-semibold text-gray-700">Email</th>
-                                        <th class="px-4 py-3 font-semibold text-gray-700">Joined</th>
-                                        <th class="px-4 py-3 font-semibold text-gray-700">Status</th>
-                                        <th class="px-4 py-3 font-semibold text-gray-700">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td class="px-4 py-3 font-medium text-gray-900">John Doe</td>
-                                        <td class="px-4 py-3 text-gray-600">john@example.com</td>
-                                        <td class="px-4 py-3 text-gray-600">2 days ago</td>
-                                        <td class="px-4 py-3"><span class="badge badge-success">Active</span></td>
-                                        <td class="px-4 py-3">
-                                            <button class="text-blue-600 hover:underline text-xs font-semibold">Manage</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-3 font-medium text-gray-900">Sarah Smith</td>
-                                        <td class="px-4 py-3 text-gray-600">sarah@example.com</td>
-                                        <td class="px-4 py-3 text-gray-600">1 week ago</td>
-                                        <td class="px-4 py-3"><span class="badge badge-success">Active</span></td>
-                                        <td class="px-4 py-3">
-                                            <button class="text-blue-600 hover:underline text-xs font-semibold">Manage</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <p class="text-gray-600 mb-4">Registered users on the platform</p>
+                        <div class="space-y-2 text-sm">
+                            <p>✓ Total Active Users: 1,248</p>
+                            <p>✓ Verified Users: 892</p>
+                            <p>✓ Business Owners: 156</p>
+                            <p>✓ New This Week: 34</p>
                         </div>
                     </div>
                     
-                    <!-- Posts Tab -->
+                    <div id="servicesTab" class="tab-content hidden">
+                        <p class="text-gray-600 mb-4">Registered service businesses</p>
+                        <div id="adminServicesList" class="space-y-4"><!-- Will be populated --></div>
+                    </div>
+                    
                     <div id="postsTab" class="tab-content hidden">
-                        <div class="space-y-4">
-                            <p class="text-gray-600 mb-4">Manage and moderate all posts on the platform.</p>
-                            <div class="card p-4">
-                                <p class="font-semibold text-gray-900">Professional Plumbing Services</p>
-                                <p class="text-sm text-gray-600 mt-2">Expert repairs and installations in Cosmo City...</p>
-                                <div class="flex gap-2 mt-4">
-                                    <button class="text-xs px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">Approve</button>
-                                    <button class="text-xs px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200">Remove</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Reports Tab -->
-                    <div id="reportsTab" class="tab-content hidden">
-                        <p class="text-gray-600">Flagged content and user reports for review.</p>
-                        <div class="mt-4 card p-4">
-                            <p class="font-semibold text-gray-900">Report: Inappropriate Content</p>
-                            <p class="text-sm text-gray-600 mt-1">Reported by: Jane User</p>
-                            <p class="text-sm text-gray-600">Reason: Spam</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Analytics Tab -->
-                    <div id="analyticsTab" class="tab-content hidden">
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="font-semibold text-gray-900 mb-3">User Growth</h4>
-                                <div class="h-40 bg-gradient-to-b from-blue-100 to-blue-50 rounded-lg flex items-end justify-around px-4 py-4">
-                                    <div class="flex flex-col items-center gap-2">
-                                        <div class="w-8 h-24 bg-blue-500 rounded-t-lg"></div>
-                                        <span class="text-xs text-gray-600">Mon</span>
-                                    </div>
-                                    <div class="flex flex-col items-center gap-2">
-                                        <div class="w-8 h-32 bg-blue-600 rounded-t-lg"></div>
-                                        <span class="text-xs text-gray-600">Tue</span>
-                                    </div>
-                                    <div class="flex flex-col items-center gap-2">
-                                        <div class="w-8 h-20 bg-blue-400 rounded-t-lg"></div>
-                                        <span class="text-xs text-gray-600">Wed</span>
-                                    </div>
-                                    <div class="flex flex-col items-center gap-2">
-                                        <div class="w-8 h-28 bg-blue-500 rounded-t-lg"></div>
-                                        <span class="text-xs text-gray-600">Thu</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <p class="text-gray-600 mb-4">Recent platform posts</p>
+                        <div class="space-y-2 text-sm">
+                            <p>• 15 New Posts Today</p>
+                            <p>• 3 Pending Review</p>
+                            <p>• 8 Flagged for Moderation</p>
                         </div>
                     </div>
                 </div>
@@ -566,23 +473,17 @@
         <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full my-8">
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
                 <h3 class="text-2xl font-bold text-gray-900">Create New Post</h3>
-                <button onclick="closeCreatePostModal()" class="text-gray-500 hover:text-gray-700">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <button onclick="closeCreatePostModal()" class="text-gray-500 hover:text-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             
             <form onsubmit="submitPost(event)" class="p-6 space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
-                    <select id="postCategory" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <option value="">Select a category</option>
-                        <option value="Jobs">Jobs</option>
-                        <option value="Services">Services</option>
-                        <option value="Buy & Sell">Buy & Sell</option>
-                        <option value="Businesses">Businesses</option>
-                        <option value="Rentals">Rentals</option>
-                        <option value="Events">Events</option>
-                        <option value="Community">Community</option>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Post Type *</label>
+                    <select id="postType" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="">Select a post type</option>
+                        <option value="product">Marketplace (Buy & Sell)</option>
+                        <option value="service-request">Service Request</option>
+                        <option value="job-listing">Job Listing</option>
                     </select>
                 </div>
                 
@@ -593,7 +494,7 @@
                 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
-                    <textarea id="postDescription" required rows="4" placeholder="Describe your post in detail..." class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"></textarea>
+                    <textarea id="postDescription" required rows="4" placeholder="Describe your post in detail..." class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                 </div>
                 
                 <div class="grid md:grid-cols-2 gap-4">
@@ -610,21 +511,11 @@
                     </div>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Images (Optional)</label>
-                    <input type="file" id="postImages" multiple accept="image/*" class="w-full border border-gray-300 rounded-lg px-3 py-2">
-                    <p class="text-xs text-gray-500 mt-1">Add up to 5 images to make your post stand out</p>
-                </div>
-                
                 <div class="border-t border-gray-200 pt-6 space-y-4">
                     <h4 class="font-semibold text-gray-900">Contact Information</h4>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">WhatsApp Number *</label>
                         <input type="tel" id="postWhatsApp" required placeholder="+27 71 234 5678" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email (Optional)</label>
-                        <input type="email" id="postEmail" placeholder="your@email.com" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                 </div>
                 
@@ -636,208 +527,253 @@
         </div>
     </div>
     
-    <!-- POST DETAIL MODAL -->
-    <div id="postDetailModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <!-- INQUIRY SERVICE MODAL -->
+    <div id="inquiryServiceModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full my-8">
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <h3 class="text-2xl font-bold text-gray-900" id="detailTitle">Post Title</h3>
-                <button onclick="closePostDetailModal()" class="text-gray-500 hover:text-gray-700">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <h3 class="text-2xl font-bold text-gray-900" id="inquiryServiceName">Service Name</h3>
+                <button onclick="closeInquiryServiceModal()" class="text-gray-500 hover:text-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             
             <div class="p-6 space-y-6">
-                <!-- Post images carousel would go here -->
-                <div id="detailCategory" class="flex gap-2">
-                    <span class="badge badge-primary" id="detailCategoryBadge">Category</span>
+                <p id="inquiryServiceDescription" class="text-gray-600 leading-relaxed">Description goes here</p>
+                
+                <div class="py-4 border-y border-gray-200">
+                    <p class="text-xs text-gray-500 font-semibold uppercase mb-2">Location</p>
+                    <p id="inquiryServiceLocation" class="font-semibold text-gray-900">Cosmo City</p>
                 </div>
                 
-                <p id="detailDescription" class="text-gray-600 leading-relaxed">Description goes here</p>
-                
-                <div class="grid md:grid-cols-2 gap-4 py-4 border-y border-gray-200">
-                    <div>
-                        <p class="text-xs text-gray-500 font-semibold uppercase">Price</p>
-                        <p class="text-2xl font-bold text-blue-600" id="detailPrice">R 0</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 font-semibold uppercase">Location</p>
-                        <p class="font-semibold text-gray-900" id="detailLocation">Cosmo City</p>
-                    </div>
-                </div>
-                
-                <!-- Seller Info -->
                 <div class="card p-4">
                     <div class="flex items-start gap-4">
-                        <div class="avatar bg-gradient-to-br from-blue-500 to-blue-600">J</div>
+                        <div class="avatar bg-gradient-to-br from-blue-500 to-blue-600" id="inquiryProviderAvatar">J</div>
                         <div class="flex-1">
-                            <h4 class="font-semibold text-gray-900" id="detailSeller">John Doe</h4>
-                            <p class="text-sm text-gray-600" id="detailSellerInfo">Active 2 hours ago</p>
+                            <h4 class="font-semibold text-gray-900" id="inquiryProviderName">John Doe</h4>
+                            <p class="text-sm text-gray-600" id="inquiryProviderInfo">Rating: 4.8 ★</p>
                             <div class="flex gap-2 mt-2">
                                 <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Verified</span>
-                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">4.8 ★</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Action Buttons -->
                 <div class="flex gap-3">
-                    <button onclick="contactViaSave()" class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2">
-                        <i data-lucide="heart" class="w-5 h-5"></i>
-                        Save
+                    <button onclick="callServiceProvider()" class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                        <i data-lucide="phone" class="w-5 h-5"></i>Call
                     </button>
-                    <button onclick="reportPost()" class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2">
-                        <i data-lucide="flag" class="w-5 h-5"></i>
-                        Report
+                    <button onclick="sendServiceEnquiry()" class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                        <i data-lucide="mail" class="w-5 h-5"></i>Enquiry
                     </button>
-                    <button onclick="contactViaWhatsApp()" class="flex-1 btn-primary flex items-center justify-center gap-2">
-                        <i data-lucide="message-circle" class="w-5 h-5"></i>
-                        WhatsApp
+                    <button onclick="contactViaWhatsAppService()" class="flex-1 btn-primary flex items-center justify-center gap-2">
+                        <i data-lucide="message-circle" class="w-5 h-5"></i>WhatsApp
                     </button>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- FOOTER -->
-    <footer class="bg-gray-900 text-gray-300 py-12 px-4 mt-20">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">C</div>
-                        <span class="font-bold text-white">CosmoConnect</span>
-                    </div>
-                    <p class="text-sm">Your local marketplace and community hub for Cosmo City, Johannesburg.</p>
-                </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Browse</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Jobs</a></li>
-                        <li><a href="#" class="hover:text-white transition">Services</a></li>
-                        <li><a href="#" class="hover:text-white transition">Businesses</a></li>
-                        <li><a href="#" class="hover:text-white transition">Events</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Support</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
-                        <li><a href="#" class="hover:text-white transition">Community Guidelines</a></li>
-                        <li><a href="#" class="hover:text-white transition">Safety Tips</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Legal</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
-                        <li><a href="#" class="hover:text-white transition">Cookie Policy</a></li>
-                    </ul>
-                </div>
+    <!-- BOOKING SERVICE MODAL -->
+    <div id="bookingServiceModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full my-8">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-900" id="bookingServiceName">Service Name</h3>
+                <button onclick="closeBookingServiceModal()" class="text-gray-500 hover:text-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
-            <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-sm text-gray-400">&copy; 2026 CosmoConnect. All rights reserved. | Built for Cosmo City, Johannesburg</p>
-                <div class="flex gap-4 mt-4 md:mt-0">
-                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-lucide="facebook" class="w-5 h-5"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-lucide="twitter" class="w-5 h-5"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+            
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Available Services</label>
+                    <div id="bookingServicesList" class="space-y-3"><!-- Services will be populated here --></div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Preferred Date *</label>
+                        <input type="date" id="bookingDate" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Preferred Time *</label>
+                        <input type="time" id="bookingTime" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+                
+                <div class="card p-4">
+                    <div class="flex items-start gap-4">
+                        <div class="avatar bg-gradient-to-br from-blue-500 to-blue-600" id="bookingProviderAvatar">J</div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900" id="bookingProviderName">John Doe</h4>
+                            <p class="text-sm text-gray-600" id="bookingProviderInfo">Rating: 4.8 ★</p>
+                            <p class="text-sm text-gray-600 mt-1" id="bookingProviderHours">Mon-Fri: 08:00-17:00</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeBookingServiceModal()" class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                    <button onclick="confirmBooking()" class="flex-1 btn-primary">Book Now</button>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
     
     <script>
-        // Initialize Lucide Icons
         lucide.createIcons();
         
-        // APP STATE
-        const appState = {
-            currentUser: {
-                id: 1,
-                name: 'John Doe',
-                email: 'john@example.com',
-                phone: '+27712345678',
-                location: 'Extension 4, Cosmo City',
-                bio: 'Passionate about helping my community.',
-                avatar: null,
-                verified: true,
-                rating: 4.8
-            },
-            posts: [
-                {
-                    id: 1,
-                    title: 'Professional Plumbing Services',
-                    category: 'Services',
-                    description: 'Expert geyser installations, drain unblocking & leak repairs. 15 years experience in Cosmo City.',
-                    price: 250,
-                    location: 'Cosmo City, Johannesburg',
-                    whatsapp: '+27712345678',
-                    email: 'john@example.com',
-                    seller: { name: 'John Doe', id: 1, rating: 4.8 },
-                    images: [],
-                    likes: 12,
-                    comments: 3,
-                    saved: false,
-                    created: '2 hours ago'
-                },
-                {
-                    id: 2,
-                    title: 'Looking for Graphic Designer',
-                    category: 'Jobs',
-                    description: 'Need experienced graphic designer for branding project. Must have portfolio.',
-                    price: 2000,
-                    location: 'Cosmo City, Johannesburg',
-                    whatsapp: '+27823456789',
-                    email: 'sarah@example.com',
-                    seller: { name: 'Sarah Smith', id: 2, rating: 4.5 },
-                    images: [],
-                    likes: 8,
-                    comments: 2,
-                    saved: false,
-                    created: '4 hours ago'
-                },
-                {
-                    id: 3,
-                    title: 'Sony TV - 55 inch Smart TV',
-                    category: 'Buy & Sell',
-                    description: 'Excellent condition, barely used. Comes with remote and wall mount. Price negotiable.',
-                    price: 3500,
-                    location: 'Extension 2, Cosmo City',
-                    whatsapp: '+27734567891',
-                    email: '',
-                    seller: { name: 'Mike Johnson', id: 3, rating: 4.2 },
-                    images: [],
-                    likes: 24,
-                    comments: 5,
-                    saved: false,
-                    created: '6 hours ago'
-                }
-            ],
-            messages: [
-                { id: 1, sender: 'Sarah Smith', lastMessage: 'When can you start the project?', time: '2 hours ago', unread: true }
-            ],
-            filters: {
-                category: '',
-                priceRange: '',
-                location: ''
+        // ===== AUTHENTICATION =====
+        function checkAuthStatus() {
+            const user = sessionStorage.getItem('cosmoConnectUser');
+            const authView = document.getElementById('authView');
+            const mainContent = document.getElementById('mainContent');
+            const mainHeader = document.getElementById('mainHeader');
+            
+            if (user) {
+                authView.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                mainHeader.classList.remove('hidden');
+                
+                const userData = JSON.parse(user);
+                loadUserProfile(userData);
+                checkAdminAccess(userData.email);
+                showView('home');
+            } else {
+                authView.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+                mainHeader.classList.add('hidden');
             }
+        }
+        
+        function handleCredentialResponse(response) {
+            const base64Url = response.credential.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            const userdata = JSON.parse(jsonPayload);
+            
+            const user = {
+                id: userdata.sub,
+                name: userdata.name,
+                email: userdata.email,
+                picture: userdata.picture,
+                verified: true,
+                rating: 5.0,
+                location: 'Cosmo City, Johannesburg',
+                phone: '+27 71 234 5678',
+                bio: 'Welcome to CosmoConnect!'
+            };
+            
+            sessionStorage.setItem('cosmoConnectUser', JSON.stringify(user));
+            checkAuthStatus();
+        }
+        
+        function checkAdminAccess(email) {
+            const adminEmail = 'macmillanmuraangwa@gmail.com';
+            const adminMenuBtn = document.getElementById('adminMenuBtn');
+            if (email === adminEmail && adminMenuBtn) {
+                adminMenuBtn.classList.remove('hidden');
+            }
+        }
+        
+        function loadUserProfile(userData) {
+            document.getElementById('profileName').textContent = userData.name;
+            document.getElementById('profileEmail').href = `mailto:${userData.email}`;
+            document.getElementById('profileEmail').textContent = userData.email;
+            
+            const firstLetter = userData.name.charAt(0).toUpperCase();
+            document.getElementById('profileAvatar').textContent = firstLetter;
+            
+            appState.currentUser = {
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                phone: userData.phone || '+27712345678',
+                location: userData.location || 'Cosmo City, Johannesburg',
+                bio: userData.bio || 'Welcome to CosmoConnect!',
+                avatar: userData.picture,
+                verified: true,
+                rating: 5.0
+            };
+        }
+        
+        document.getElementById('emailSignInForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('signInEmail').value;
+            
+            const user = {
+                id: 'email_' + Date.now(),
+                name: email.split('@')[0],
+                email: email,
+                verified: true,
+                rating: 5.0,
+                location: 'Cosmo City, Johannesburg',
+                phone: '+27 71 234 5678',
+                bio: 'Welcome to CosmoConnect!'
+            };
+            
+            sessionStorage.setItem('cosmoConnectUser', JSON.stringify(user));
+            checkAuthStatus();
+        });
+        
+        document.getElementById('emailSignUpForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signUpName').value;
+            const email = document.getElementById('signUpEmail').value;
+            const phone = document.getElementById('signUpPhone').value;
+            
+            const user = {
+                id: 'email_' + Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                verified: false,
+                rating: 5.0,
+                location: 'Cosmo City, Johannesburg',
+                bio: 'Welcome to CosmoConnect!'
+            };
+            
+            sessionStorage.setItem('cosmoConnectUser', JSON.stringify(user));
+            checkAuthStatus();
+        });
+        
+        function showSignUpForm() {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('signupView').classList.remove('hidden');
+        }
+        
+        function showSignInForm() {
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('authView').classList.remove('hidden');
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to sign out?')) {
+                sessionStorage.removeItem('cosmoConnectUser');
+                if (window.google) google.accounts.id.disableAutoSelect();
+                checkAuthStatus();
+            }
+        }
+        
+        // ===== APP STATE =====
+        const appState = {
+            currentUser: { id: 1, name: 'John Doe', email: 'john@example.com', phone: '+27712345678', location: 'Extension 4, Cosmo City', bio: 'Passionate about helping my community.', avatar: null, verified: true, rating: 4.8 },
+            posts: [
+                { id: 1, title: 'Sony TV - 55 inch Smart TV', type: 'product', description: 'Excellent condition, barely used.', price: 3500, location: 'Extension 2, Cosmo City', whatsapp: '+27734567891', seller: { name: 'Mike Johnson', id: 3, rating: 4.2 }, images: [], likes: 24, saved: false, created: '6 hours ago' }
+            ],
+            services: [
+                { id: 101, name: 'Expert Plumbing', category: 'Plumbers', businessType: 'inquiry', description: '24/7 Emergency plumbing, geyser repairs, installations.', rating: 4.8, location: 'Extension 2, Cosmo City', phone: '+27712345678', whatsapp: '+27712345678', verified: true, owner: { name: 'John Plumber', id: 101, rating: 4.8 } },
+                { id: 102, name: 'Master Electrician', category: 'Electricians', businessType: 'inquiry', description: 'All electrical work: installations, repairs, maintenance.', rating: 4.9, location: 'Extension 5, Cosmo City', phone: '+27723456789', whatsapp: '+27723456789', verified: true, owner: { name: 'Kabelo Electric', id: 102, rating: 4.9 } },
+                { id: 201, name: 'Prime Barber Shop', category: 'Barbers', businessType: 'booking', description: 'Professional barber services with experienced stylists.', rating: 4.7, location: 'Extension 3, Cosmo City', phone: '+27734567890', whatsapp: '+27734567890', verified: true, owner: { name: 'Mohammed Barber', id: 201, rating: 4.7 }, workingHours: { start: '08:00', end: '18:00', daysOff: ['Sunday'] }, services: [ { id: 1, name: 'Haircut', price: 80, duration: 30 }, { id: 2, name: 'Beard Trim', price: 50, duration: 15 }, { id: 3, name: 'Haircut + Beard', price: 120, duration: 45 } ] },
+                { id: 202, name: 'Glamour Hair Salon', category: 'Salons', businessType: 'booking', description: 'Full hair services: cuts, colors, treatments, braids.', rating: 4.6, location: 'Extension 1, Cosmo City', phone: '+27745678901', whatsapp: '+27745678901', verified: true, owner: { name: 'Nomsa Salon', id: 202, rating: 4.6 }, workingHours: { start: '09:00', end: '19:00', daysOff: ['Monday'] }, services: [ { id: 1, name: 'Hair Cut', price: 150, duration: 45 }, { id: 2, name: 'Hair Color', price: 300, duration: 120 }, { id: 3, name: 'Braids', price: 500, duration: 180 } ] },
+                { id: 203, name: 'Beauty Spa & Nails', category: 'Beauty', businessType: 'booking', description: 'Nails, spa treatments, massages.', rating: 4.8, location: 'Extension 4, Cosmo City', phone: '+27756789012', whatsapp: '+27756789012', verified: true, owner: { name: 'Zainab Spa', id: 203, rating: 4.8 }, workingHours: { start: '10:00', end: '20:00', daysOff: [] }, services: [ { id: 1, name: 'Gel Nails', price: 250, duration: 90 }, { id: 2, name: 'Full Body Massage', price: 400, duration: 60 } ] }
+            ],
+            messages: [{ id: 1, sender: 'Sarah Smith', lastMessage: 'When can you start the project?', time: '2 hours ago', unread: true }],
+            filters: { category: '', priceRange: '', location: '' }
         };
         
-        // UPDATE MESSAGE BADGE
         function updateMessageBadge() {
             const unreadCount = appState.messages.filter(m => m.unread).length;
             document.getElementById('msgBadge').textContent = unreadCount;
-            document.getElementById('navMsgBadge').textContent = unreadCount;
         }
         
-        // VIEW MANAGEMENT
         function showView(viewName) {
-            // Hide all views
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-            
-            // Show requested view
             const viewId = viewName + 'View';
             const view = document.getElementById(viewId);
             if (view) {
@@ -845,69 +781,151 @@
                 view.classList.add('fade-in');
             }
             
-            // Update mobile nav highlighting
-            if (viewName === 'home') {
-                document.getElementById('navHome').classList.add('text-blue-600');
-                document.getElementById('navMarket').classList.remove('text-blue-600');
-                document.getElementById('navProfile').classList.remove('text-blue-600');
-            }
-            
-            // Render content for specific views
-            if (viewName === 'marketplace') {
-                renderPosts(appState.posts);
-            } else if (viewName === 'jobs') {
-                renderJobs();
-            } else if (viewName === 'profile') {
-                renderProfile();
-            }
+            if (viewName === 'marketplace') renderPosts(appState.posts);
+            else if (viewName === 'services') renderServices(appState.services);
             
             window.scrollTo(0, 0);
         }
         
-        // MOBILE MENU
         function toggleMobileMenu() {
             const drawer = document.getElementById('mobileMenuDrawer');
-            const overlay = document.getElementById('mobileMenuOverlay');
-            const panel = document.getElementById('mobileMenuPanel');
-            
             if (drawer.classList.contains('hidden')) {
                 drawer.classList.remove('hidden');
                 setTimeout(() => {
-                    overlay.classList.remove('opacity-0');
-                    panel.classList.remove('translate-x-full');
+                    document.getElementById('mobileMenuOverlay').classList.remove('opacity-0');
+                    document.getElementById('mobileMenuPanel').classList.remove('translate-x-full');
                 }, 10);
             } else {
-                overlay.classList.add('opacity-0');
-                panel.classList.add('translate-x-full');
+                document.getElementById('mobileMenuOverlay').classList.add('opacity-0');
+                document.getElementById('mobileMenuPanel').classList.add('translate-x-full');
                 setTimeout(() => drawer.classList.add('hidden'), 300);
             }
         }
         
-        // POST OPERATIONS
-        function openCreatePostModal() {
-            document.getElementById('createPostModal').classList.remove('hidden');
+        // ===== SERVICES =====
+        function renderServices(services) {
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = '';
+            
+            services.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'card p-6 hover:shadow-lg transition cursor-pointer';
+                const label = service.businessType === 'inquiry' ? '🔧 Quick Service' : '📅 Bookable Service';
+                
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <div><h3 class="font-semibold text-lg text-gray-900">${service.name}</h3><p class="text-xs text-gray-500 mt-1">${service.category}</p></div>
+                        <span class="badge badge-primary text-xs">${label}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">${service.description}</p>
+                    <div class="flex items-center justify-between py-4 border-y border-gray-200">
+                        <div><p class="text-xs text-gray-500">Location</p><p class="font-semibold text-gray-900">${service.location}</p></div>
+                        <div class="text-right"><p class="text-xs text-gray-500">Rating</p><p class="font-bold text-yellow-500">${service.rating} ★</p></div>
+                    </div>
+                    <button onclick="showServiceDetail(${service.id})" class="w-full btn-primary mt-4">View Details</button>
+                `;
+                grid.appendChild(card);
+            });
+            
+            lucide.createIcons();
         }
         
-        function closeCreatePostModal() {
-            document.getElementById('createPostModal').classList.add('hidden');
+        function showServiceDetail(serviceId) {
+            const service = appState.services.find(s => s.id === serviceId);
+            if (!service) return;
+            
+            if (service.businessType === 'inquiry') showInquiryService(service);
+            else showBookingService(service);
         }
+        
+        function showInquiryService(service) {
+            document.getElementById('inquiryServiceName').textContent = service.name;
+            document.getElementById('inquiryServiceDescription').textContent = service.description;
+            document.getElementById('inquiryServiceLocation').textContent = service.location;
+            document.getElementById('inquiryProviderName').textContent = service.owner.name;
+            document.getElementById('inquiryProviderInfo').textContent = `Rating: ${service.rating} ★`;
+            document.getElementById('inquiryProviderAvatar').textContent = service.owner.name.charAt(0).toUpperCase();
+            window.currentService = service;
+            document.getElementById('inquiryServiceModal').classList.remove('hidden');
+        }
+        
+        function showBookingService(service) {
+            document.getElementById('bookingServiceName').textContent = service.name;
+            document.getElementById('bookingProviderName').textContent = service.owner.name;
+            document.getElementById('bookingProviderInfo').textContent = `Rating: ${service.rating} ★`;
+            document.getElementById('bookingProviderHours').textContent = `${service.workingHours.start}-${service.workingHours.end}`;
+            document.getElementById('bookingProviderAvatar').textContent = service.owner.name.charAt(0).toUpperCase();
+            
+            const servicesList = document.getElementById('bookingServicesList');
+            servicesList.innerHTML = '';
+            
+            service.services.forEach(svc => {
+                const div = document.createElement('div');
+                div.className = 'p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 transition';
+                div.onclick = () => selectBookingService(svc, service);
+                div.innerHTML = `<div class="flex justify-between items-center"><div><p class="font-semibold text-gray-900">${svc.name}</p><p class="text-xs text-gray-500">${svc.duration} min</p></div><p class="font-bold text-blue-600">R ${svc.price}</p></div>`;
+                servicesList.appendChild(div);
+            });
+            
+            window.currentBookingService = service;
+            document.getElementById('bookingServiceModal').classList.remove('hidden');
+        }
+        
+        function selectBookingService(service, parentService) {
+            window.selectedService = service;
+        }
+        
+        function closeInquiryServiceModal() { document.getElementById('inquiryServiceModal').classList.add('hidden'); }
+        function closeBookingServiceModal() { document.getElementById('bookingServiceModal').classList.add('hidden'); }
+        
+        function callServiceProvider() {
+            const service = window.currentService;
+            if (service && service.phone) window.location.href = `tel:${service.phone}`;
+        }
+        
+        function sendServiceEnquiry() {
+            const service = window.currentService;
+            if (service) alert(`Enquiry form for ${service.name}`);
+        }
+        
+        function contactViaWhatsAppService() {
+            const service = window.currentService;
+            if (service && service.whatsapp) {
+                const message = `Hi, I found your business on CosmoConnect. I'm interested in your ${service.category} services. Can you provide a quotation?`;
+                window.open(`https://wa.me/${service.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+        
+        function confirmBooking() {
+            if (!window.selectedService || !window.currentBookingService) { alert('Please select a service'); return; }
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('bookingTime').value;
+            if (!date || !time) { alert('Please select date and time'); return; }
+            
+            const service = window.selectedService;
+            const booking = window.currentBookingService;
+            const message = `Hi, I'd like to book a ${service.name} (R${service.price}) on ${date} at ${time}. Please confirm.`;
+            window.open(`https://wa.me/${booking.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+            closeBookingServiceModal();
+        }
+        
+        // ===== POSTS =====
+        function openCreatePostModal() { document.getElementById('createPostModal').classList.remove('hidden'); }
+        function closeCreatePostModal() { document.getElementById('createPostModal').classList.add('hidden'); }
         
         function submitPost(e) {
             e.preventDefault();
-            
             const newPost = {
                 id: appState.posts.length + 1,
                 title: document.getElementById('postTitle').value,
-                category: document.getElementById('postCategory').value,
+                type: document.getElementById('postType').value,
                 description: document.getElementById('postDescription').value,
                 price: parseFloat(document.getElementById('postPrice').value) || 0,
                 location: document.getElementById('postLocation').value,
                 whatsapp: document.getElementById('postWhatsApp').value,
-                email: document.getElementById('postEmail').value,
                 seller: appState.currentUser,
                 images: [],
                 likes: 0,
-                comments: 0,
                 saved: false,
                 created: 'Just now'
             };
@@ -926,7 +944,6 @@
             posts.forEach(post => {
                 const card = document.createElement('div');
                 card.className = 'card p-0 overflow-hidden hover:shadow-lg transition cursor-pointer';
-                card.onclick = () => showPostDetail(post);
                 
                 card.innerHTML = `
                     <div class="bg-gradient-to-br from-blue-100 to-blue-50 h-40 flex items-center justify-center">
@@ -934,7 +951,7 @@
                     </div>
                     <div class="p-4">
                         <div class="flex items-start justify-between mb-2">
-                            <span class="badge badge-primary text-xs">${post.category}</span>
+                            <span class="badge badge-primary text-xs">${post.type}</span>
                             <span class="text-xs text-gray-500">${post.created}</span>
                         </div>
                         <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${post.title}</h3>
@@ -944,203 +961,51 @@
                                 <p class="text-xs text-gray-500">Price</p>
                                 <p class="text-lg font-bold text-blue-600">${post.price > 0 ? 'R ' + post.price.toLocaleString() : 'Contact'}</p>
                             </div>
-                            <div class="flex gap-2">
-                                <button onclick="event.stopPropagation(); toggleLike(${post.id})" class="text-red-400 hover:text-red-500">
-                                    <i data-lucide="heart" class="w-5 h-5"></i>
-                                </button>
-                                <button onclick="event.stopPropagation()" class="text-gray-400 hover:text-gray-500">
-                                    <i data-lucide="message-square" class="w-5 h-5"></i>
-                                </button>
-                            </div>
+                            <button onclick="event.stopPropagation()" class="text-red-400 hover:text-red-500"><i data-lucide="heart" class="w-5 h-5"></i></button>
                         </div>
                     </div>
                 `;
-                
                 grid.appendChild(card);
             });
             
             lucide.createIcons();
         }
         
-        function renderJobs() {
-            const jobsGrid = document.getElementById('jobsGrid');
-            jobsGrid.innerHTML = '';
-            
-            const jobs = appState.posts.filter(p => p.category === 'Jobs');
-            
-            if (jobs.length === 0) {
-                jobsGrid.innerHTML = '<div class="text-center py-12 text-gray-500">No jobs posted yet. Be the first to post!</div>';
-                return;
-            }
-            
-            jobs.forEach(job => {
-                jobsGrid.innerHTML += `
-                    <div class="card p-6 cursor-pointer hover:shadow-md transition" onclick="showPostDetail(${job.id})">
-                        <div class="flex items-start justify-between mb-3">
-                            <span class="badge badge-primary">Job Opportunity</span>
-                            <span class="text-xs text-gray-500">${job.created}</span>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${job.title}</h3>
-                        <p class="text-gray-600 mb-4">${job.description}</p>
-                        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                            <div>
-                                <p class="text-xs text-gray-500">Salary</p>
-                                <p class="font-bold text-blue-600">R ${job.price.toLocaleString()}</p>
-                            </div>
-                            <button onclick="event.stopPropagation(); contactViaWhatsApp('${job.whatsapp}')" class="btn-primary text-sm">
-                                Apply Now
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            lucide.createIcons();
+        function filterByCategory(category) { appState.filters.category = category; showView('marketplace'); }
+        function filterByBusinessType(businessType, category) {
+            const filtered = appState.services.filter(s => s.businessType === businessType && s.category === category);
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = '';
+            renderServices(filtered);
+            showView('services');
         }
         
-        function renderProfile() {
-            const user = appState.currentUser;
-            const myPostsGrid = document.getElementById('myPostsGrid');
-            
-            // Render user's posts
-            const userPosts = appState.posts.filter(p => p.seller.id === user.id);
-            myPostsGrid.innerHTML = '';
-            
-            if (userPosts.length === 0) {
-                myPostsGrid.innerHTML = '<p class="text-gray-600">You haven\'t created any posts yet.</p>';
-            } else {
-                userPosts.forEach(post => {
-                    myPostsGrid.innerHTML += `
-                        <div class="card p-4 flex items-start justify-between">
-                            <div class="flex-1">
-                                <h5 class="font-semibold text-gray-900">${post.title}</h5>
-                                <p class="text-sm text-gray-600">${post.category} • ${post.created}</p>
-                            </div>
-                            <button class="text-blue-600 hover:text-blue-700 font-semibold text-sm">Edit</button>
-                        </div>
-                    `;
-                });
-            }
-            
-            lucide.createIcons();
-        }
+        function applyFilters() { renderPosts(appState.posts); }
+        function clearFilters() { renderPosts(appState.posts); }
+        function applyServiceFilters() { renderServices(appState.services); }
+        function clearServiceFilters() { renderServices(appState.services); }
+        function performSearch() { showView('services'); }
+        function editProfile() { alert('Edit profile functionality coming soon!'); }
+        function toggleProfileMenu() { alert('Profile menu'); }
         
-        function showPostDetail(post) {
-            if (typeof post === 'number') {
-                post = appState.posts.find(p => p.id === post);
-            }
-            
-            document.getElementById('detailTitle').textContent = post.title;
-            document.getElementById('detailCategory').innerHTML = `<span class="badge badge-primary">${post.category}</span>`;
-            document.getElementById('detailDescription').textContent = post.description;
-            document.getElementById('detailPrice').textContent = post.price > 0 ? 'R ' + post.price.toLocaleString() : 'Contact for price';
-            document.getElementById('detailLocation').textContent = post.location;
-            document.getElementById('detailSeller').textContent = post.seller.name;
-            document.getElementById('detailSellerInfo').textContent = `Rating: ${post.seller.rating} ⭐`;
-            document.getElementById('postDetailModal').classList.remove('hidden');
-        }
-        
-        function closePostDetailModal() {
-            document.getElementById('postDetailModal').classList.add('hidden');
-        }
-        
-        function contactViaWhatsApp(phone) {
-            const phone_num = phone || appState.posts[0].whatsapp;
-            window.open(`https://wa.me/${phone_num.replace(/\D/g, '')}?text=Hello, I'm interested in your listing on CosmoConnect!`, '_blank');
-        }
-        
-        function toggleLike(postId) {
-            const post = appState.posts.find(p => p.id === postId);
-            if (post) {
-                post.saved = !post.saved;
-                post.likes += post.saved ? 1 : -1;
-            }
-        }
-        
-        function reportPost() {
-            alert('Post reported. Thank you for helping keep CosmoConnect safe!');
-            closePostDetailModal();
-        }
-        
-        function contactViaSave() {
-            alert('Post saved to your favorites!');
-        }
-        
-        // FILTER OPERATIONS
-        function filterByCategory(category) {
-            appState.filters.category = category;
-            document.getElementById('filterCategory').value = category;
-            applyFilters();
-            showView('marketplace');
-        }
-        
-        function applyFilters() {
-            appState.filters.category = document.getElementById('filterCategory').value;
-            appState.filters.priceRange = document.getElementById('filterPrice').value;
-            appState.filters.location = document.getElementById('filterLocation').value;
-            
-            let filtered = appState.posts;
-            
-            if (appState.filters.category) {
-                filtered = filtered.filter(p => p.category === appState.filters.category);
-            }
-            
-            if (appState.filters.location) {
-                filtered = filtered.filter(p => p.location.toLowerCase().includes(appState.filters.location.toLowerCase()));
-            }
-            
-            renderPosts(filtered);
-        }
-        
-        function clearFilters() {
-            document.getElementById('filterCategory').value = '';
-            document.getElementById('filterPrice').value = '';
-            document.getElementById('filterLocation').value = '';
-            appState.filters = { category: '', priceRange: '', location: '' };
-            renderPosts(appState.posts);
-        }
-        
-        function performSearch() {
-            const query = document.getElementById('heroSearch').value;
-            const filtered = appState.posts.filter(p => 
-                p.title.toLowerCase().includes(query.toLowerCase()) ||
-                p.description.toLowerCase().includes(query.toLowerCase())
-            );
-            renderPosts(filtered);
-            showView('marketplace');
-        }
-        
-        // ADMIN FUNCTIONS
-        function switchAdminTab(tabName) {
-            // Hide all tabs
+        function switchAdminTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-                btn.classList.add('text-gray-600');
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                b.classList.add('text-gray-600');
             });
             
-            // Show selected tab
-            document.getElementById(tabName + 'Tab').classList.remove('hidden');
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
-        }
-        
-        function editProfile() {
-            alert('Profile editing coming soon!');
-        }
-        
-        function logout() {
-            if (confirm('Are you sure you want to sign out?')) {
-                alert('You have been signed out.');
-                showView('home');
+            const tabEl = document.getElementById(tab + 'Tab');
+            if (tabEl) tabEl.classList.remove('hidden');
+            
+            const btnEl = document.querySelector(`[data-tab="${tab}"]`);
+            if (btnEl) {
+                btnEl.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
             }
         }
         
-        // INITIALIZATION
+        checkAuthStatus();
         updateMessageBadge();
-        showView('home');
-        
-        // Re-create icons on DOM changes
-        setInterval(() => lucide.createIcons(), 1000);
     </script>
 </body>
 </html>
