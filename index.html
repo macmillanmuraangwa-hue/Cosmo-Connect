@@ -7,8 +7,10 @@
     <meta name="theme-color" content="#0A2540">
     <title>CosmoConnect - Cosmo City's Local Marketplace & Community Hub</title>
     
-    <!-- Google Sign-In -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -85,12 +87,34 @@
         .avatar {
             @apply w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg;
         }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
     
+    <!-- LOADING SCREEN -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="loader mx-auto mb-4"></div>
+            <p class="text-gray-600 font-semibold">Loading CosmoConnect...</p>
+        </div>
+    </div>
+    
     <!-- AUTH VIEW -->
-    <section id="authView" class="view-section fade-in min-h-screen flex items-center justify-center px-4">
+    <section id="authView" class="view-section fade-in min-h-screen flex items-center justify-center px-4 hidden">
         <div class="max-w-md w-full">
             <div class="card p-8 text-center">
                 <!-- Logo -->
@@ -99,8 +123,15 @@
                 <p class="text-gray-600 mb-8">Cosmo City's Local Marketplace & Community Hub</p>
                 
                 <!-- Google Sign-In Button -->
-                <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE" data-callback="handleCredentialResponse"></div>
-                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular" data-logo_alignment="left"></div>
+                <button onclick="signInWithGoogle()" class="w-full bg-white border border-gray-300 hover:border-gray-400 text-gray-700 font-semibold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2 mb-4">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
+                    </svg>
+                    Sign in with Google
+                </button>
                 
                 <div class="relative my-6">
                     <div class="absolute inset-0 flex items-center">
@@ -119,13 +150,8 @@
                 </form>
                 
                 <p class="text-gray-600 text-sm mt-4">
-                    Don't have an account? <button onclick="showSignUpForm()" class="text-blue-600 hover:underline font-semibold">Sign up</button>
+                    Don't have an account? <button type="button" onclick="showSignUpForm()" class="text-blue-600 hover:underline font-semibold">Sign up</button>
                 </p>
-                
-                <!-- Admin Test Info -->
-                <div class="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p class="text-xs text-blue-700"><strong>Demo Admin:</strong> macmillanmuraangwa@gmail.com</p>
-                </div>
             </div>
         </div>
     </section>
@@ -138,8 +164,15 @@
                 <h1 class="text-3xl font-bold text-gray-900 mb-2 text-center">Create Account</h1>
                 <p class="text-gray-600 mb-8 text-center">Join CosmoConnect today</p>
                 
-                <div id="g_id_onload_signup" data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE" data-callback="handleCredentialResponse"></div>
-                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signup_with" data-shape="rectangular" data-logo_alignment="left"></div>
+                <button onclick="signUpWithGoogle()" class="w-full bg-white border border-gray-300 hover:border-gray-400 text-gray-700 font-semibold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2 mb-4">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path>
+                    </svg>
+                    Sign up with Google
+                </button>
                 
                 <div class="relative my-6">
                     <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
@@ -155,7 +188,7 @@
                 </form>
                 
                 <p class="text-gray-600 text-sm mt-4 text-center">
-                    Already have an account? <button onclick="showSignInForm()" class="text-blue-600 hover:underline font-semibold">Sign in</button>
+                    Already have an account? <button type="button" onclick="showSignInForm()" class="text-blue-600 hover:underline font-semibold">Sign in</button>
                 </p>
             </div>
         </div>
@@ -174,7 +207,7 @@
                 <button onclick="showView('home')" class="text-gray-700 hover:text-blue-600 font-medium transition">Home</button>
                 <button onclick="showView('services')" class="text-gray-700 hover:text-blue-600 font-medium transition">Services</button>
                 <button onclick="showView('marketplace')" class="text-gray-700 hover:text-blue-600 font-medium transition">Marketplace</button>
-                <button onclick="showView('messages')" class="text-gray-700 hover:text-blue-600 font-medium transition relative">Messages <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="msgBadge">0</span></button>
+                <button onclick="showView('messages')" class="text-gray-700 hover:text-blue-600 font-medium transition relative">Messages <span id="msgBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
                 <button onclick="showView('profile')" class="text-gray-700 hover:text-blue-600 font-medium transition">Profile</button>
             </nav>
             
@@ -214,7 +247,7 @@
                         <span>Welcome to Cosmo City, Johannesburg</span>
                     </div>
                     <h2 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Your Local Community Hub</h2>
-                    <p class="text-lg text-blue-100 max-w-2xl mx-auto mb-8">Find trusted neighbors offering services, discover job opportunities, support local businesses, and strengthen our community.</p>
+                    <p class="text-lg text-blue-100 max-w-2xl mx-auto mb-8">Find trusted neighbors offering services, discover job opportunities, support local businesses, and strengthen our community together.</p>
                     
                     <div class="bg-white p-2 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8">
                         <div class="flex gap-2">
@@ -240,33 +273,33 @@
                     <div class="mb-12">
                         <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-2xl">🏠</span> Housing</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                            <div onclick="filterByCategory('rooms-rent')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="door-open" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Rooms to Rent</p></div>
-                            <div onclick="filterByCategory('houses-rent')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="home" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Houses to Rent</p></div>
-                            <div onclick="filterByCategory('flats-apartments')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="building-2" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Flats & Apartments</p></div>
-                            <div onclick="filterByCategory('roommates-wanted')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="users" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Roommates Wanted</p></div>
-                            <div onclick="filterByCategory('property-sale')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="tag" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Property for Sale</p></div>
+                            <div onclick="filterByCategory('rooms-rent')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="door-open" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Rooms</p></div>
+                            <div onclick="filterByCategory('houses-rent')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="home" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Houses</p></div>
+                            <div onclick="filterByCategory('flats-apartments')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="building-2" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Flats</p></div>
+                            <div onclick="filterByCategory('roommates-wanted')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="users" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Roommates</p></div>
+                            <div onclick="filterByCategory('property-sale')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="tag" class="w-8 h-8 text-blue-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Sale</p></div>
                         </div>
                     </div>
                     
                     <div class="mb-12">
                         <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-2xl">🔧</span> Find a Service</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                            <div onclick="filterByBusinessType('inquiry', 'Plumbers')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="wrench" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Plumbers</p></div>
-                            <div onclick="filterByBusinessType('inquiry', 'Electricians')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="zap" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Electricians</p></div>
-                            <div onclick="filterByBusinessType('inquiry', 'Painters')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="palette" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Painters</p></div>
-                            <div onclick="filterByBusinessType('inquiry', 'Builders')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="hard-hat" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Builders</p></div>
-                            <div onclick="filterByBusinessType('inquiry', 'Mechanics')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="wrench-2" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Mechanics</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Plumbers')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="wrench" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Plumbers</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Electricians')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="zap" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Electricians</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Painters')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="palette" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Painters</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Builders')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="hard-hat" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Builders</p></div>
+                            <div onclick="filterByBusinessType('inquiry', 'Mechanics')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="wrench-2" class="w-8 h-8 text-amber-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Mechanics</p></div>
                         </div>
                     </div>
                     
                     <div class="mb-12">
                         <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="text-2xl">🏪</span> Local Businesses</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                            <div onclick="filterByBusinessType('booking', 'Barbers')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="scissors" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Barbers</p></div>
-                            <div onclick="filterByBusinessType('booking', 'Salons')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="sparkles" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Salons</p></div>
-                            <div onclick="filterByBusinessType('booking', 'Beauty')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="heart" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Beauty & Spa</p></div>
-                            <div onclick="filterByBusinessType('booking', 'Restaurants')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="utensils" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Restaurants</p></div>
-                            <div onclick="filterByBusinessType('booking', 'Tutors')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="book" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="font-semibold text-sm text-gray-800">Tutors</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Barbers')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="scissors" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Barbers</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Salons')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="sparkles" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Salons</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Beauty')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="heart" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Beauty</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Restaurants')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="utensils" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Restaurants</p></div>
+                            <div onclick="filterByBusinessType('booking', 'Tutors')" class="card p-3 text-center cursor-pointer hover:border-blue-400"><i data-lucide="book" class="w-8 h-8 text-orange-500 mx-auto mb-2"></i><p class="text-sm font-semibold">Tutors</p></div>
                         </div>
                     </div>
                 </div>
@@ -277,9 +310,9 @@
                 <div class="max-w-6xl mx-auto">
                     <h3 class="text-2xl font-bold text-gray-900 mb-8">How It Works</h3>
                     <div class="grid md:grid-cols-3 gap-8">
-                        <div class="text-center"><div class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div><h4 class="font-bold text-lg text-gray-900 mb-2">Create Profile</h4><p class="text-gray-600">Set up your account with your details and location.</p></div>
-                        <div class="text-center"><div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div><h4 class="font-bold text-lg text-gray-900 mb-2">Find Services</h4><p class="text-gray-600">Browse local businesses or post what you need.</p></div>
-                        <div class="text-center"><div class="w-16 h-16 bg-blue-700 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div><h4 class="font-bold text-lg text-gray-900 mb-2">Connect Instantly</h4><p class="text-gray-600">Message or book via WhatsApp with one tap.</p></div>
+                        <div class="text-center"><div class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div><h4 class="font-bold text-gray-900 mb-2">Browse</h4><p class="text-gray-600">Search for services, products, and jobs in your community.</p></div>
+                        <div class="text-center"><div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div><h4 class="font-bold text-gray-900 mb-2">Connect</h4><p class="text-gray-600">Message providers and book services directly on WhatsApp.</p></div>
+                        <div class="text-center"><div class="w-16 h-16 bg-blue-700 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div><h4 class="font-bold text-gray-900 mb-2">Trust</h4><p class="text-gray-600">Rate and review to build a trusted community marketplace.</p></div>
                     </div>
                 </div>
             </div>
@@ -388,18 +421,18 @@
                     <div class="flex items-start gap-6 mb-6">
                         <div id="profileAvatar" class="avatar bg-gradient-to-br from-blue-500 to-blue-600 w-24 h-24 text-3xl">J</div>
                         <div class="flex-1">
-                            <h3 id="profileName" class="text-2xl font-bold text-gray-900">John Doe</h3>
+                            <h3 id="profileName" class="text-2xl font-bold text-gray-900">Loading...</h3>
                             <p id="profileLocation" class="text-gray-600">Cosmo City, Johannesburg</p>
                             <div class="flex gap-2 mt-3">
                                 <span class="badge badge-success"><i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>Verified</span>
-                                <span class="badge badge-primary"><i data-lucide="star" class="w-4 h-4 mr-1"></i>4.8 Stars</span>
+                                <span class="badge badge-primary"><i data-lucide="star" class="w-4 h-4 mr-1"></i><span id="profileRating">5.0</span> Stars</span>
                             </div>
                         </div>
                     </div>
                     <div class="border-t border-gray-200 pt-6 space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Bio</label>
-                            <p id="profileBio" class="text-gray-600">Passionate about helping my community.</p>
+                            <p id="profileBio" class="text-gray-600">Welcome to CosmoConnect!</p>
                         </div>
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
@@ -427,10 +460,10 @@
                 <h2 class="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Total Users</p><p class="text-4xl font-bold text-blue-600">1,248</p><p class="text-xs text-gray-500 mt-2">+12% this month</p></div>
-                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Active Posts</p><p class="text-4xl font-bold text-green-600">342</p><p class="text-xs text-gray-500 mt-2">+28 today</p></div>
-                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Services</p><p class="text-4xl font-bold text-blue-600">87</p><p class="text-xs text-gray-500 mt-2">Local Businesses</p></div>
-                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Revenue</p><p class="text-4xl font-bold text-purple-600">R45K</p><p class="text-xs text-gray-500 mt-2">+8% vs last month</p></div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Total Users</p><p id="adminTotalUsers" class="text-4xl font-bold text-blue-600">0</p><p class="text-xs text-gray-500 mt-2">Registered users</p></div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Active Posts</p><p id="adminActivePosts" class="text-4xl font-bold text-green-600">0</p><p class="text-xs text-gray-500 mt-2">Marketplace listings</p></div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Services</p><p id="adminServices" class="text-4xl font-bold text-blue-600">0</p><p class="text-xs text-gray-500 mt-2">Local businesses</p></div>
+                    <div class="card p-6"><p class="text-gray-600 text-sm font-semibold mb-2">Revenue</p><p class="text-4xl font-bold text-purple-600">R0</p><p class="text-xs text-gray-500 mt-2">Platform earnings</p></div>
                 </div>
                 
                 <div class="card p-6">
@@ -442,11 +475,8 @@
                     
                     <div id="usersTab" class="tab-content">
                         <p class="text-gray-600 mb-4">Registered users on the platform</p>
-                        <div class="space-y-2 text-sm">
-                            <p>✓ Total Active Users: 1,248</p>
-                            <p>✓ Verified Users: 892</p>
-                            <p>✓ Business Owners: 156</p>
-                            <p>✓ New This Week: 34</p>
+                        <div id="adminUsersList" class="space-y-2 text-sm">
+                            <!-- Will be populated -->
                         </div>
                     </div>
                     
@@ -457,11 +487,7 @@
                     
                     <div id="postsTab" class="tab-content hidden">
                         <p class="text-gray-600 mb-4">Recent platform posts</p>
-                        <div class="space-y-2 text-sm">
-                            <p>• 15 New Posts Today</p>
-                            <p>• 3 Pending Review</p>
-                            <p>• 8 Flagged for Moderation</p>
-                        </div>
+                        <div id="adminPostsList" class="space-y-4"><!-- Will be populated --></div>
                     </div>
                 </div>
             </div>
@@ -616,162 +642,263 @@
     </div>
     
     <script>
-        lucide.createIcons();
-        
-        // ===== AUTHENTICATION =====
-        function checkAuthStatus() {
-            const user = sessionStorage.getItem('cosmoConnectUser');
-            const authView = document.getElementById('authView');
-            const mainContent = document.getElementById('mainContent');
-            const mainHeader = document.getElementById('mainHeader');
+        // ===== FIREBASE CONFIGURATION =====
+        // TODO: Replace with your Firebase config from Firebase Console
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== AUTHENTICATION STATE MANAGEMENT =====
+        let currentUser = null;
+
+        // Listen for auth state changes
+        auth.onAuthStateChanged(async (user) => {
+            document.getElementById('loadingScreen').style.display = 'none';
             
             if (user) {
-                authView.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                mainHeader.classList.remove('hidden');
-                
-                const userData = JSON.parse(user);
-                loadUserProfile(userData);
-                checkAdminAccess(userData.email);
-                showView('home');
+                currentUser = user;
+                await loadUserProfile(user);
+                checkAdminAccess(user.email);
+                showAuthenticatedUI();
+                loadAppData();
             } else {
-                authView.classList.remove('hidden');
-                mainContent.classList.add('hidden');
-                mainHeader.classList.add('hidden');
+                currentUser = null;
+                showAuthenticationUI();
+            }
+        });
+
+        // ===== GOOGLE AUTHENTICATION =====
+        async function signInWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                alert('Failed to sign in with Google: ' + error.message);
             }
         }
-        
-        function handleCredentialResponse(response) {
-            const base64Url = response.credential.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-            const userdata = JSON.parse(jsonPayload);
-            
-            const user = {
-                id: userdata.sub,
-                name: userdata.name,
-                email: userdata.email,
-                picture: userdata.picture,
-                verified: true,
-                rating: 5.0,
-                location: 'Cosmo City, Johannesburg',
-                phone: '+27 71 234 5678',
-                bio: 'Welcome to CosmoConnect!'
-            };
-            
-            sessionStorage.setItem('cosmoConnectUser', JSON.stringify(user));
-            checkAuthStatus();
-        }
-        
-        function checkAdminAccess(email) {
-            const adminEmail = 'macmillanmuraangwa@gmail.com';
-            const adminMenuBtn = document.getElementById('adminMenuBtn');
-            if (email === adminEmail && adminMenuBtn) {
-                adminMenuBtn.classList.remove('hidden');
+
+        async function signUpWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+            } catch (error) {
+                console.error('Google sign-up error:', error);
+                alert('Failed to sign up with Google: ' + error.message);
             }
         }
-        
-        function loadUserProfile(userData) {
-            document.getElementById('profileName').textContent = userData.name;
-            document.getElementById('profileEmail').href = `mailto:${userData.email}`;
-            document.getElementById('profileEmail').textContent = userData.email;
-            
-            const firstLetter = userData.name.charAt(0).toUpperCase();
-            document.getElementById('profileAvatar').textContent = firstLetter;
-            
-            appState.currentUser = {
-                id: userData.id,
-                name: userData.name,
-                email: userData.email,
-                phone: userData.phone || '+27712345678',
-                location: userData.location || 'Cosmo City, Johannesburg',
-                bio: userData.bio || 'Welcome to CosmoConnect!',
-                avatar: userData.picture,
-                verified: true,
-                rating: 5.0
-            };
-        }
-        
-        document.getElementById('emailSignInForm')?.addEventListener('submit', function(e) {
+
+        // ===== EMAIL AUTHENTICATION =====
+        document.getElementById('emailSignInForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('signInEmail').value;
+            const password = document.getElementById('signInPassword').value;
             
-            const user = {
-                id: 'email_' + Date.now(),
-                name: email.split('@')[0],
-                email: email,
-                verified: true,
-                rating: 5.0,
-                location: 'Cosmo City, Johannesburg',
-                phone: '+27 71 234 5678',
-                bio: 'Welcome to CosmoConnect!'
-            };
-            
-            sessionStorage.setItem('cosmoConnectUser', JSON.stringify(user));
-            checkAuthStatus();
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                alert('Sign in failed: ' + error.message);
+            }
         });
-        
-        document.getElementById('emailSignUpForm')?.addEventListener('submit', function(e) {
+
+        document.getElementById('emailSignUpForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = document.getElementById('signUpName').value;
             const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
             const phone = document.getElementById('signUpPhone').value;
             
-            const user = {
-                id: 'email_' + Date.now(),
-                name: name,
-                email: email,
-                phone: phone,
-                verified: false,
-                rating: 5.0,
-                location: 'Cosmo City, Johannesburg',
-                bio: 'Welcome to CosmoConnect!'
-            };
-            
-            sessionStorage.setItem('cosmoConnectUser', JSON.stringify(user));
-            checkAuthStatus();
+            try {
+                // Create user account
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                
+                // Save user profile to Firestore
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    uid: userCredential.user.uid,
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    location: 'Cosmo City, Johannesburg',
+                    bio: 'Welcome to CosmoConnect!',
+                    avatar: null,
+                    verified: false,
+                    rating: 5.0,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+                
+                // Update user profile
+                await userCredential.user.updateProfile({ displayName: name });
+                
+            } catch (error) {
+                alert('Sign up failed: ' + error.message);
+            }
         });
-        
+
+        // ===== UI STATE MANAGEMENT =====
+        function showAuthenticationUI() {
+            document.getElementById('authView').classList.remove('hidden');
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('mainHeader').classList.add('hidden');
+        }
+
+        function showAuthenticatedUI() {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('mainHeader').classList.remove('hidden');
+            showView('home');
+        }
+
         function showSignUpForm() {
             document.getElementById('authView').classList.add('hidden');
             document.getElementById('signupView').classList.remove('hidden');
         }
-        
+
         function showSignInForm() {
             document.getElementById('signupView').classList.add('hidden');
             document.getElementById('authView').classList.remove('hidden');
         }
-        
-        function logout() {
-            if (confirm('Are you sure you want to sign out?')) {
-                sessionStorage.removeItem('cosmoConnectUser');
-                if (window.google) google.accounts.id.disableAutoSelect();
-                checkAuthStatus();
+
+        // ===== PROFILE MANAGEMENT =====
+        async function loadUserProfile(user) {
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    document.getElementById('profileName').textContent = userData.name;
+                    document.getElementById('profileEmail').href = `mailto:${userData.email}`;
+                    document.getElementById('profileEmail').textContent = userData.email;
+                    document.getElementById('profilePhone').href = `tel:${userData.phone}`;
+                    document.getElementById('profilePhone').textContent = userData.phone;
+                    document.getElementById('profileBio').textContent = userData.bio;
+                    document.getElementById('profileRating').textContent = userData.rating;
+                    
+                    const firstLetter = userData.name.charAt(0).toUpperCase();
+                    document.getElementById('profileAvatar').textContent = firstLetter;
+                    
+                    appState.currentUser = {
+                        id: user.uid,
+                        name: userData.name,
+                        email: userData.email,
+                        phone: userData.phone,
+                        location: userData.location,
+                        bio: userData.bio,
+                        avatar: userData.avatar,
+                        verified: userData.verified,
+                        rating: userData.rating
+                    };
+                } else {
+                    // Create user profile if it doesn't exist
+                    const newUserData = {
+                        uid: user.uid,
+                        name: user.displayName || user.email.split('@')[0],
+                        email: user.email,
+                        phone: '',
+                        location: 'Cosmo City, Johannesburg',
+                        bio: 'Welcome to CosmoConnect!',
+                        avatar: user.photoURL || null,
+                        verified: user.emailVerified,
+                        rating: 5.0,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    };
+                    
+                    await db.collection('users').doc(user.uid).set(newUserData);
+                    await loadUserProfile(user);
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
             }
         }
-        
+
+        function checkAdminAccess(email) {
+            const adminEmails = ['macmillanmuraangwa@gmail.com'];
+            const adminMenuBtn = document.getElementById('adminMenuBtn');
+            if (adminEmails.includes(email) && adminMenuBtn) {
+                adminMenuBtn.classList.remove('hidden');
+            }
+        }
+
+        async function logout() {
+            if (confirm('Are you sure you want to sign out?')) {
+                try {
+                    await auth.signOut();
+                    showAuthenticationUI();
+                } catch (error) {
+                    alert('Sign out failed: ' + error.message);
+                }
+            }
+        }
+
         // ===== APP STATE =====
         const appState = {
-            currentUser: { id: 1, name: 'John Doe', email: 'john@example.com', phone: '+27712345678', location: 'Extension 4, Cosmo City', bio: 'Passionate about helping my community.', avatar: null, verified: true, rating: 4.8 },
-            posts: [
-                { id: 1, title: 'Sony TV - 55 inch Smart TV', type: 'product', description: 'Excellent condition, barely used.', price: 3500, location: 'Extension 2, Cosmo City', whatsapp: '+27734567891', seller: { name: 'Mike Johnson', id: 3, rating: 4.2 }, images: [], likes: 24, saved: false, created: '6 hours ago' }
-            ],
-            services: [
-                { id: 101, name: 'Expert Plumbing', category: 'Plumbers', businessType: 'inquiry', description: '24/7 Emergency plumbing, geyser repairs, installations.', rating: 4.8, location: 'Extension 2, Cosmo City', phone: '+27712345678', whatsapp: '+27712345678', verified: true, owner: { name: 'John Plumber', id: 101, rating: 4.8 } },
-                { id: 102, name: 'Master Electrician', category: 'Electricians', businessType: 'inquiry', description: 'All electrical work: installations, repairs, maintenance.', rating: 4.9, location: 'Extension 5, Cosmo City', phone: '+27723456789', whatsapp: '+27723456789', verified: true, owner: { name: 'Kabelo Electric', id: 102, rating: 4.9 } },
-                { id: 201, name: 'Prime Barber Shop', category: 'Barbers', businessType: 'booking', description: 'Professional barber services with experienced stylists.', rating: 4.7, location: 'Extension 3, Cosmo City', phone: '+27734567890', whatsapp: '+27734567890', verified: true, owner: { name: 'Mohammed Barber', id: 201, rating: 4.7 }, workingHours: { start: '08:00', end: '18:00', daysOff: ['Sunday'] }, services: [ { id: 1, name: 'Haircut', price: 80, duration: 30 }, { id: 2, name: 'Beard Trim', price: 50, duration: 15 }, { id: 3, name: 'Haircut + Beard', price: 120, duration: 45 } ] },
-                { id: 202, name: 'Glamour Hair Salon', category: 'Salons', businessType: 'booking', description: 'Full hair services: cuts, colors, treatments, braids.', rating: 4.6, location: 'Extension 1, Cosmo City', phone: '+27745678901', whatsapp: '+27745678901', verified: true, owner: { name: 'Nomsa Salon', id: 202, rating: 4.6 }, workingHours: { start: '09:00', end: '19:00', daysOff: ['Monday'] }, services: [ { id: 1, name: 'Hair Cut', price: 150, duration: 45 }, { id: 2, name: 'Hair Color', price: 300, duration: 120 }, { id: 3, name: 'Braids', price: 500, duration: 180 } ] },
-                { id: 203, name: 'Beauty Spa & Nails', category: 'Beauty', businessType: 'booking', description: 'Nails, spa treatments, massages.', rating: 4.8, location: 'Extension 4, Cosmo City', phone: '+27756789012', whatsapp: '+27756789012', verified: true, owner: { name: 'Zainab Spa', id: 203, rating: 4.8 }, workingHours: { start: '10:00', end: '20:00', daysOff: [] }, services: [ { id: 1, name: 'Gel Nails', price: 250, duration: 90 }, { id: 2, name: 'Full Body Massage', price: 400, duration: 60 } ] }
-            ],
-            messages: [{ id: 1, sender: 'Sarah Smith', lastMessage: 'When can you start the project?', time: '2 hours ago', unread: true }],
+            currentUser: null,
+            posts: [],
+            services: [],
+            messages: [],
             filters: { category: '', priceRange: '', location: '' }
         };
-        
-        function updateMessageBadge() {
-            const unreadCount = appState.messages.filter(m => m.unread).length;
-            document.getElementById('msgBadge').textContent = unreadCount;
+
+        // ===== LOAD APP DATA FROM FIRESTORE =====
+        async function loadAppData() {
+            try {
+                // Load posts
+                const postsSnapshot = await db.collection('posts').limit(50).get();
+                appState.posts = postsSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // Load services
+                const servicesSnapshot = await db.collection('services').limit(50).get();
+                appState.services = servicesSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // Update admin stats
+                updateAdminStats();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
         }
-        
+
+        async function updateAdminStats() {
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                const postsSnapshot = await db.collection('posts').get();
+                const servicesSnapshot = await db.collection('services').get();
+
+                document.getElementById('adminTotalUsers').textContent = usersSnapshot.size;
+                document.getElementById('adminActivePosts').textContent = postsSnapshot.size;
+                document.getElementById('adminServices').textContent = servicesSnapshot.size;
+
+                // Populate admin lists
+                const usersList = document.getElementById('adminUsersList');
+                usersList.innerHTML = '';
+                usersSnapshot.docs.forEach(doc => {
+                    const userData = doc.data();
+                    usersList.innerHTML += `<p>✓ ${userData.name} (${userData.email})</p>`;
+                });
+            } catch (error) {
+                console.error('Error updating admin stats:', error);
+            }
+        }
+
+        // ===== VIEW MANAGEMENT =====
         function showView(viewName) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             const viewId = viewName + 'View';
@@ -786,7 +913,7 @@
             
             window.scrollTo(0, 0);
         }
-        
+
         function toggleMobileMenu() {
             const drawer = document.getElementById('mobileMenuDrawer');
             if (drawer.classList.contains('hidden')) {
@@ -801,7 +928,7 @@
                 setTimeout(() => drawer.classList.add('hidden'), 300);
             }
         }
-        
+
         // ===== SERVICES =====
         function renderServices(services) {
             const grid = document.getElementById('servicesGrid');
@@ -822,14 +949,14 @@
                         <div><p class="text-xs text-gray-500">Location</p><p class="font-semibold text-gray-900">${service.location}</p></div>
                         <div class="text-right"><p class="text-xs text-gray-500">Rating</p><p class="font-bold text-yellow-500">${service.rating} ★</p></div>
                     </div>
-                    <button onclick="showServiceDetail(${service.id})" class="w-full btn-primary mt-4">View Details</button>
+                    <button onclick="showServiceDetail('${service.id}')" class="w-full btn-primary mt-4">View Details</button>
                 `;
                 grid.appendChild(card);
             });
             
             lucide.createIcons();
         }
-        
+
         function showServiceDetail(serviceId) {
             const service = appState.services.find(s => s.id === serviceId);
             if (!service) return;
@@ -837,57 +964,59 @@
             if (service.businessType === 'inquiry') showInquiryService(service);
             else showBookingService(service);
         }
-        
+
         function showInquiryService(service) {
             document.getElementById('inquiryServiceName').textContent = service.name;
             document.getElementById('inquiryServiceDescription').textContent = service.description;
             document.getElementById('inquiryServiceLocation').textContent = service.location;
-            document.getElementById('inquiryProviderName').textContent = service.owner.name;
+            document.getElementById('inquiryProviderName').textContent = service.owner?.name || 'Service Provider';
             document.getElementById('inquiryProviderInfo').textContent = `Rating: ${service.rating} ★`;
-            document.getElementById('inquiryProviderAvatar').textContent = service.owner.name.charAt(0).toUpperCase();
+            document.getElementById('inquiryProviderAvatar').textContent = (service.owner?.name || 'S').charAt(0).toUpperCase();
             window.currentService = service;
             document.getElementById('inquiryServiceModal').classList.remove('hidden');
         }
-        
+
         function showBookingService(service) {
             document.getElementById('bookingServiceName').textContent = service.name;
-            document.getElementById('bookingProviderName').textContent = service.owner.name;
+            document.getElementById('bookingProviderName').textContent = service.owner?.name || 'Service Provider';
             document.getElementById('bookingProviderInfo').textContent = `Rating: ${service.rating} ★`;
-            document.getElementById('bookingProviderHours').textContent = `${service.workingHours.start}-${service.workingHours.end}`;
-            document.getElementById('bookingProviderAvatar').textContent = service.owner.name.charAt(0).toUpperCase();
+            document.getElementById('bookingProviderHours').textContent = service.workingHours ? `${service.workingHours.start}-${service.workingHours.end}` : 'Mon-Fri: 08:00-17:00';
+            document.getElementById('bookingProviderAvatar').textContent = (service.owner?.name || 'S').charAt(0).toUpperCase();
             
             const servicesList = document.getElementById('bookingServicesList');
             servicesList.innerHTML = '';
             
-            service.services.forEach(svc => {
-                const div = document.createElement('div');
-                div.className = 'p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 transition';
-                div.onclick = () => selectBookingService(svc, service);
-                div.innerHTML = `<div class="flex justify-between items-center"><div><p class="font-semibold text-gray-900">${svc.name}</p><p class="text-xs text-gray-500">${svc.duration} min</p></div><p class="font-bold text-blue-600">R ${svc.price}</p></div>`;
-                servicesList.appendChild(div);
-            });
+            if (service.services && Array.isArray(service.services)) {
+                service.services.forEach(svc => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 transition';
+                    div.onclick = () => selectBookingService(svc, service);
+                    div.innerHTML = `<div class="flex justify-between items-center"><div><p class="font-semibold text-gray-900">${svc.name}</p><p class="text-xs text-gray-500">${svc.duration} min</p></div><p class="font-bold text-blue-600">R${svc.price}</p></div>`;
+                    servicesList.appendChild(div);
+                });
+            }
             
             window.currentBookingService = service;
             document.getElementById('bookingServiceModal').classList.remove('hidden');
         }
-        
+
         function selectBookingService(service, parentService) {
             window.selectedService = service;
         }
-        
+
         function closeInquiryServiceModal() { document.getElementById('inquiryServiceModal').classList.add('hidden'); }
         function closeBookingServiceModal() { document.getElementById('bookingServiceModal').classList.add('hidden'); }
-        
+
         function callServiceProvider() {
             const service = window.currentService;
             if (service && service.phone) window.location.href = `tel:${service.phone}`;
         }
-        
+
         function sendServiceEnquiry() {
             const service = window.currentService;
             if (service) alert(`Enquiry form for ${service.name}`);
         }
-        
+
         function contactViaWhatsAppService() {
             const service = window.currentService;
             if (service && service.whatsapp) {
@@ -895,7 +1024,7 @@
                 window.open(`https://wa.me/${service.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
             }
         }
-        
+
         function confirmBooking() {
             if (!window.selectedService || !window.currentBookingService) { alert('Please select a service'); return; }
             const date = document.getElementById('bookingDate').value;
@@ -908,35 +1037,50 @@
             window.open(`https://wa.me/${booking.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
             closeBookingServiceModal();
         }
-        
+
         // ===== POSTS =====
         function openCreatePostModal() { document.getElementById('createPostModal').classList.remove('hidden'); }
         function closeCreatePostModal() { document.getElementById('createPostModal').classList.add('hidden'); }
-        
-        function submitPost(e) {
+
+        async function submitPost(e) {
             e.preventDefault();
+            
+            if (!currentUser) {
+                alert('Please sign in to create a post');
+                return;
+            }
+
             const newPost = {
-                id: appState.posts.length + 1,
                 title: document.getElementById('postTitle').value,
                 type: document.getElementById('postType').value,
                 description: document.getElementById('postDescription').value,
                 price: parseFloat(document.getElementById('postPrice').value) || 0,
                 location: document.getElementById('postLocation').value,
                 whatsapp: document.getElementById('postWhatsApp').value,
-                seller: appState.currentUser,
+                seller: {
+                    id: currentUser.uid,
+                    name: appState.currentUser.name,
+                    email: currentUser.email
+                },
                 images: [],
                 likes: 0,
                 saved: false,
-                created: 'Just now'
+                createdAt: new Date(),
+                status: 'active'
             };
             
-            appState.posts.unshift(newPost);
-            closeCreatePostModal();
-            e.target.reset();
-            alert('Post created successfully!');
-            showView('marketplace');
+            try {
+                const docRef = await db.collection('posts').add(newPost);
+                appState.posts.unshift({ id: docRef.id, ...newPost });
+                closeCreatePostModal();
+                e.target.reset();
+                alert('Post created successfully!');
+                showView('marketplace');
+            } catch (error) {
+                alert('Failed to create post: ' + error.message);
+            }
         }
-        
+
         function renderPosts(posts) {
             const grid = document.getElementById('postsGrid');
             grid.innerHTML = '';
@@ -952,7 +1096,7 @@
                     <div class="p-4">
                         <div class="flex items-start justify-between mb-2">
                             <span class="badge badge-primary text-xs">${post.type}</span>
-                            <span class="text-xs text-gray-500">${post.created}</span>
+                            <span class="text-xs text-gray-500">${post.createdAt ? new Date(post.createdAt.toDate()).toLocaleDateString() : 'Recent'}</span>
                         </div>
                         <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${post.title}</h3>
                         <p class="text-sm text-gray-600 mb-4 line-clamp-2">${post.description}</p>
@@ -970,24 +1114,21 @@
             
             lucide.createIcons();
         }
-        
+
         function filterByCategory(category) { appState.filters.category = category; showView('marketplace'); }
         function filterByBusinessType(businessType, category) {
             const filtered = appState.services.filter(s => s.businessType === businessType && s.category === category);
-            const grid = document.getElementById('servicesGrid');
-            grid.innerHTML = '';
             renderServices(filtered);
             showView('services');
         }
-        
+
         function applyFilters() { renderPosts(appState.posts); }
         function clearFilters() { renderPosts(appState.posts); }
         function applyServiceFilters() { renderServices(appState.services); }
         function clearServiceFilters() { renderServices(appState.services); }
         function performSearch() { showView('services'); }
         function editProfile() { alert('Edit profile functionality coming soon!'); }
-        function toggleProfileMenu() { alert('Profile menu'); }
-        
+
         function switchAdminTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => {
@@ -998,14 +1139,14 @@
             const tabEl = document.getElementById(tab + 'Tab');
             if (tabEl) tabEl.classList.remove('hidden');
             
-            const btnEl = document.querySelector(`[data-tab="${tab}"]`);
-            if (btnEl) {
-                btnEl.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+            const btn = document.querySelector(`[data-tab="${tab}"]`);
+            if (btn) {
+                btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                btn.classList.remove('text-gray-600');
             }
         }
-        
-        checkAuthStatus();
-        updateMessageBadge();
+
+        lucide.createIcons();
     </script>
 </body>
 </html>
